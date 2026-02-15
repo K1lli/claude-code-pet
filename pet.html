@@ -164,16 +164,81 @@
 
   /* ── BASE STATE ANIMATIONS ─────────────────────────────────────── */
 
-  /* IDLE */
-  .state-idle .body { animation: idle-bob 2.5s ease-in-out infinite; }
+  /* IDLE (base — breathing + blinking) */
+  .state-idle .body { animation: idle-breathe 3s ease-in-out infinite; }
   .state-idle .antenna { animation: antenna-sway 3s ease-in-out infinite; }
-  @keyframes idle-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+  .state-idle .eye { animation: idle-blink 4s ease-in-out infinite; }
+
+  /* IDLE - VIBING */
+  .state-idle-vibing .body { animation: idle-vibe 1.5s ease-in-out infinite; }
+  .state-idle-vibing .antenna { animation: antenna-sway 2s ease-in-out infinite; }
+  .state-idle-vibing .eye { animation: idle-blink 4s ease-in-out infinite; }
+  .state-idle-vibing .mouth {
+    width: 18px; height: 10px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 57px; left: 51px;
+  }
+
+  /* IDLE - SLEEPY */
+  .state-idle-sleepy .body { animation: idle-breathe 4s ease-in-out infinite; }
+  .state-idle-sleepy .antenna { animation: antenna-sway 4s ease-in-out infinite; }
+  .state-idle-sleepy .eye { animation: idle-drowsy 3s ease-in-out infinite; }
+  .state-idle-sleepy .mouth {
+    width: 12px; height: 6px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 59px; left: 54px;
+  }
+
+  /* IDLE - COFFEE */
+  .state-idle-coffee .body { animation: idle-breathe 3s ease-in-out infinite; }
+  .state-idle-coffee .antenna { animation: antenna-sway 3s ease-in-out infinite; }
+  .state-idle-coffee .eye { animation: idle-blink 5s ease-in-out infinite; }
+  .state-idle-coffee .mouth {
+    width: 16px; height: 8px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 57px; left: 52px;
+  }
+
+  /* IDLE - STARGAZING */
+  .state-idle-stargazing .body { animation: idle-breathe 3.5s ease-in-out infinite; }
+  .state-idle-stargazing .antenna { animation: antenna-sway 3s ease-in-out infinite; }
+  .state-idle-stargazing .antenna::after {
+    animation: stargaze-glow 3s ease-in-out infinite;
+  }
+  .state-idle-stargazing .pupil { animation: stargaze-eyes 4s ease-in-out infinite; }
+
+  @keyframes idle-breathe {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-3px) scale(1.02); }
   }
   @keyframes antenna-sway {
     0%, 100% { transform: rotate(-5deg); }
     50% { transform: rotate(5deg); }
+  }
+  @keyframes idle-blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    96% { transform: scaleY(0.1); }
+  }
+  @keyframes idle-vibe {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(-2px) translateY(-3px); }
+    75% { transform: translateX(2px) translateY(-3px); }
+  }
+  @keyframes idle-drowsy {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(0.4); }
+  }
+  @keyframes stargaze-glow {
+    0%, 100% { box-shadow: 0 0 8px rgba(255,159,67,0.5); }
+    33% { box-shadow: 0 0 14px rgba(116,185,255,0.6); }
+    66% { box-shadow: 0 0 14px rgba(162,155,254,0.6); }
+  }
+  @keyframes stargaze-eyes {
+    0%, 100% { transform: translate(0, -3px); }
+    50% { transform: translate(1px, -4px); }
   }
 
   /* THINKING */
@@ -669,6 +734,62 @@
         particles: null,
       },
 
+      "idle-vibing": {
+        label: "vibing~",
+        accessory: null,
+        particles: {
+          items: [
+            `<span style="color:#74b9ff;font-size:14px;font-family:serif">&#9835;</span>`,
+            `<span style="color:#a29bfe;font-size:12px;font-family:serif">&#9834;</span>`,
+            `<span style="color:#fd79a8;font-size:13px;font-family:serif">&#9835;</span>`,
+            SVG.sparkle("#74b9ff"),
+          ],
+          anim: "sway-float", rate: 800,
+        },
+      },
+
+      "idle-sleepy": {
+        label: "sleepy...",
+        accessory: null,
+        particles: {
+          items: [
+            `<span style="color:#a29bfe;font-size:14px;font-weight:bold;font-family:monospace;opacity:0.8">Z</span>`,
+            `<span style="color:#6c5ce7;font-size:11px;font-weight:bold;font-family:monospace;opacity:0.6">z</span>`,
+            `<span style="color:#a29bfe;font-size:9px;font-weight:bold;font-family:monospace;opacity:0.5">z</span>`,
+          ],
+          anim: "float-up", rate: 1200,
+        },
+      },
+
+      "idle-coffee": {
+        label: "coffee break",
+        // Tiny coffee mug with steam
+        accessory: `<svg viewBox="0 0 24 24" width="20" height="20" style="top:64px;left:74px;">
+          <rect x="2" y="8" width="14" height="14" rx="2" fill="#b2bec3"/>
+          <path d="M16,11 C20,11 20,19 16,19" fill="none" stroke="#b2bec3" stroke-width="2" stroke-linecap="round"/>
+          <rect x="4" y="10" width="10" height="10" rx="1" fill="#795548" opacity="0.6"/>
+          <path d="M6,6 Q7,2 8,6" fill="none" stroke="#dfe6e9" stroke-width="1.2" opacity="0.5">
+            <animate attributeName="d" values="M6,6 Q7,2 8,6;M6,3 Q7,-1 8,3;M6,6 Q7,2 8,6" dur="2s" repeatCount="indefinite"/>
+          </path>
+          <path d="M10,5 Q11,1 12,5" fill="none" stroke="#dfe6e9" stroke-width="1.2" opacity="0.4">
+            <animate attributeName="d" values="M10,5 Q11,1 12,5;M10,2 Q11,-2 12,2;M10,5 Q11,1 12,5" dur="2.5s" repeatCount="indefinite"/>
+          </path>
+        </svg>`,
+        particles: {
+          items: [SVG.cloud("#dfe6e9"), SVG.cloud("#b2bec3"), SVG.sparkle("#795548")],
+          anim: "sway-float", rate: 1400,
+        },
+      },
+
+      "idle-stargazing": {
+        label: "stargazing...",
+        accessory: null,
+        particles: {
+          items: [SVG.star("#74b9ff"), SVG.sparkle("#a29bfe"), SVG.star("#ffeaa7"), SVG.dot("#dfe6e9")],
+          anim: "sway-float", rate: 1000,
+        },
+      },
+
       thinking: {
         label: "thinking...",
         // Thought bubble with animated dots
@@ -986,11 +1107,50 @@
       },
     };
 
+    // ── IDLE MOOD CYCLING ─────────────────────────────────────────
+    const IDLE_VARIANTS = ["idle", "idle-vibing", "idle-sleepy", "idle-coffee", "idle-stargazing"];
+    let idleCycleTimer = null;
+    let idleCycleIndex = 0;
+
+    function startIdleCycle() {
+      stopIdleCycle();
+      idleCycleIndex = 0;
+      applyIdleMood();
+      idleCycleTimer = setInterval(() => {
+        idleCycleIndex = (idleCycleIndex + 1) % IDLE_VARIANTS.length;
+        applyIdleMood();
+      }, 12000);
+    }
+
+    function applyIdleMood() {
+      const variant = IDLE_VARIANTS[idleCycleIndex];
+      const config = ANIMATIONS[variant];
+      scene.className = "scene state-" + variant;
+      label.textContent = config.label;
+      currentState = variant;
+      updateAccessories(config);
+      updateParticles(config);
+    }
+
+    function stopIdleCycle() {
+      if (idleCycleTimer) {
+        clearInterval(idleCycleTimer);
+        idleCycleTimer = null;
+      }
+    }
+
     // ── STATE MANAGEMENT ────────────────────────────────────────────
 
     function setState(state) {
       const config = ANIMATIONS[state] || ANIMATIONS["thinking"];
       const effectiveState = ANIMATIONS[state] ? state : "thinking";
+
+      const wasIdle = currentState.startsWith("idle");
+      const goingIdle = effectiveState === "idle";
+
+      if (!goingIdle && wasIdle) stopIdleCycle();
+      if (goingIdle && !wasIdle) { startIdleCycle(); return; }
+      if (goingIdle && wasIdle) return;
 
       if (currentState === effectiveState) return;
 
@@ -1046,12 +1206,12 @@
     // ── IPC ─────────────────────────────────────────────────────────
 
     ipcRenderer.on("status-change", (e, status) => setState(status));
-    setState("idle");
+    startIdleCycle();
 
     // ── MOUSE EYE TRACKING ──────────────────────────────────────────
 
     document.addEventListener("mousemove", (e) => {
-      const noTrack = ["thinking", "searching", "reading", "installing", "downloading", "coding", "cooking", "testing"];
+      const noTrack = ["thinking", "searching", "reading", "installing", "downloading", "coding", "cooking", "testing", "idle-sleepy", "idle-stargazing"];
       if (noTrack.includes(currentState)) return;
 
       const pupils = document.querySelectorAll(".pupil");
