@@ -1,0 +1,50 @@
+{
+  "name": "claude-code-pet",
+  "version": "1.0.0",
+  "description": "Desktop pet that animates based on Claude Code activity",
+  "author": "Claude Code Pet",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "set-idle": "node set-status.js idle",
+    "set-thinking": "node set-status.js thinking",
+    "set-coding": "node set-status.js coding",
+    "set-success": "node set-status.js success",
+    "set-error": "node set-status.js error"
+  },
+  "build": {
+    "appId": "com.claude-code-pet.app",
+    "productName": "Claude Code Pet",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "deleteAppDataOnUninstall": true
+    },
+    "files": [
+      "main.js",
+      "pet.html",
+      "hook.js",
+      "set-status.js",
+      "icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "hook.js",
+        "to": "hook.js"
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^25.1.8"
+  }
+}
