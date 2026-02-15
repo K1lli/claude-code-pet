@@ -1546,10 +1546,10 @@
       success: "Success", error: "Error",
       "coding-flow": "Flow", "coding-hacking": "Hacking",
       "thinking-eureka": "Eureka", "thinking-galaxy": "Galaxy Brain",
-      "thinking-cooking": "Cooking", "thinking-action": "Action",
-      "thinking-creating": "Creating", "thinking-processing": "Processing",
-      "thinking-growing": "Growing", "thinking-magical": "Magical",
-      "thinking-silly": "Silly", "thinking-exploring": "Exploring",
+      "thinking-cooking": "Thinking", "thinking-action": "Thinking",
+      "thinking-creating": "Thinking", "thinking-processing": "Thinking",
+      "thinking-growing": "Thinking", "thinking-magical": "Thinking",
+      "thinking-silly": "Thinking", "thinking-exploring": "Thinking",
       "debugging-detective": "Detective", "debugging-rage": "Rage",
       "searching-treasure": "Treasure Hunt", "searching-deep": "Deep Diving",
       "reading-scholar": "Scholar", "reading-ancient": "Arcana",
@@ -2748,7 +2748,8 @@
         config = ANIMATIONS[theme];
         // Pick random label from pool
         if (config.labels) {
-          config = { ...config, label: config.labels[Math.floor(Math.random() * config.labels.length)] };
+          const picked = config.labels[Math.floor(Math.random() * config.labels.length)];
+          config = { ...config, label: picked.replace("...", " (thinking)") };
         }
       }
 
