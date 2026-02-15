@@ -16,6 +16,8 @@ const STATUS_FILE = path.join(
   "claude-pet-status.txt"
 );
 
+const LOG_FILE = path.join(appData, "claude-code-pet", "hook-debug.log");
+
 // Ensure directory exists
 try {
   fs.mkdirSync(path.dirname(STATUS_FILE), { recursive: true });
@@ -23,7 +25,14 @@ try {
   // ignore
 }
 
+function log(msg) {
+  try {
+    fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] ${msg}\n`);
+  } catch (e) {}
+}
+
 const hookEvent = process.argv[2];
+log(`Hook called: ${hookEvent}`);
 
 let input = "";
 process.stdin.setEncoding("utf-8");
@@ -33,9 +42,10 @@ process.stdin.on("end", () => {
   try {
     data = JSON.parse(input);
   } catch (e) {
-    // ignore parse errors
+    log(`JSON parse error: ${e.message}`);
   }
 
+  log(`Tool: ${data.tool_name || "N/A"}, Event: ${hookEvent}`);
   let status = null;
 
   switch (hookEvent) {

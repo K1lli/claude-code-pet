@@ -123,14 +123,184 @@
     box-shadow: 0 0 8px rgba(255,159,67,0.5);
   }
 
-  .shadow {
-    width: 80px;
-    height: 12px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 50%;
-    margin-top: -2px;
-    transition: all 0.3s;
+  .shadow { display: none; }
+
+  /* ---- HOVER STATS TOOLTIP ---- */
+  .stats-tooltip {
+    position: absolute;
+    top: 0; left: 0;
+    width: 200px;
+    height: 220px;
+    background: rgba(0,0,0,0.82);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 50;
+    padding: 12px 16px;
+  }
+  .scene:hover .stats-tooltip { opacity: 1; }
+  .stats-tooltip .stats-title {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    color: #ffd700;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .stats-tooltip .stat-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 9px;
+    color: rgba(255,255,255,0.85);
+  }
+  .stat-row .stat-name {
+    width: 62px;
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .stat-row .stat-bar-bg {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .stat-row .stat-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+  .stat-row .stat-lv {
+    width: 22px;
+    font-weight: bold;
+    font-size: 9px;
+  }
+
+  /* ---- SKILL LABEL + XP BAR + LEVEL BADGE ---- */
+  .skill-label {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 8px;
+    font-weight: bold;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-top: 2px;
     flex-shrink: 0;
+  }
+  .xp-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .level-badge {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 8px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.4s;
+  }
+  .xp-bar {
+    width: 80px;
+    height: 3px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 1.5px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .xp-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #0984e3, #00cec9);
+    border-radius: 1.5px;
+    transition: width 0.5s ease;
+  }
+  .xp-fill.flash {
+    background: linear-gradient(90deg, #ffeaa7, #fdcb6e, #ffeaa7);
+  }
+
+  /* ---- COLOR TIERS ---- */
+  .tier-0 .body { background: radial-gradient(circle at 35% 35%, #d4a574, #c4956a); }
+  .tier-1 .body { background: radial-gradient(circle at 35% 35%, #e8a96a, #cd7f32); }
+  .tier-2 .body { background: radial-gradient(circle at 35% 35%, #a8c4d8, #7ba3bf); }
+  .tier-3 .body { background: radial-gradient(circle at 35% 35%, #f0d070, #d4a020); }
+  .tier-4 .body { background: radial-gradient(circle at 35% 35%, #e8b4b8, #c77f84); }
+  .tier-5 .body { background: radial-gradient(circle at 35% 35%, #a29bfe, #6c5ce7); animation-name: prismatic-breathe !important; }
+
+  .tier-1 .foot { background: #b87333; }
+  .tier-2 .foot { background: #7ba3bf; }
+  .tier-3 .foot { background: #c4941a; }
+  .tier-4 .foot { background: #b06a6e; }
+  .tier-5 .foot { background: #6c5ce7; }
+
+  @keyframes prismatic-breathe {
+    0%, 100% { transform: translateY(0) scale(1); background: radial-gradient(circle at 35% 35%, #a29bfe, #6c5ce7); }
+    25% { transform: translateY(-3px) scale(1.02); background: radial-gradient(circle at 35% 35%, #74b9ff, #0984e3); }
+    50% { transform: translateY(0) scale(1); background: radial-gradient(circle at 35% 35%, #fd79a8, #e84393); }
+    75% { transform: translateY(-3px) scale(1.02); background: radial-gradient(circle at 35% 35%, #55efc4, #00b894); }
+  }
+
+  /* ---- MILESTONE LAYER ---- */
+  .milestone-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 120px; height: 120px;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .milestone-layer svg {
+    position: absolute;
+    transition: opacity 0.5s;
+  }
+
+  /* ---- LEVEL UP CELEBRATION ---- */
+  .glow-pulse {
+    animation: glow-pulse-anim 0.6s ease-in-out 3 !important;
+  }
+  @keyframes glow-pulse-anim {
+    0%, 100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
+    50% { filter: brightness(1.4) drop-shadow(0 0 12px rgba(255,215,0,0.8)); }
+  }
+
+  /* ---- CONFETTI ---- */
+  .confetti-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 200px; height: 220px;
+    pointer-events: none;
+    z-index: 30;
+    overflow: hidden;
+  }
+  .confetti {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    opacity: 0;
+  }
+  @keyframes confetti-fall {
+    0% { opacity: 1; transform: translateY(-20px) translateX(0) rotate(0deg) scale(1); }
+    25% { opacity: 1; transform: translateY(40px) translateX(var(--drift, 10px)) rotate(180deg) scale(0.95); }
+    50% { opacity: 0.9; transform: translateY(100px) translateX(calc(var(--drift, 10px) * -0.5)) rotate(400deg) scale(0.8); }
+    100% { opacity: 0; transform: translateY(230px) translateX(var(--drift, 10px)) rotate(720deg) scale(0.4); }
   }
 
   /* ---- LAYERS ---- */
@@ -239,6 +409,130 @@
   @keyframes stargaze-eyes {
     0%, 100% { transform: translate(0, -3px); }
     50% { transform: translate(1px, -4px); }
+  }
+
+  /* IDLE - STRETCHING (Uncommon rare) */
+  .state-idle-stretching .body { animation: idle-stretch 3s ease-in-out infinite; }
+  .state-idle-stretching .antenna { animation: antenna-sway 3s ease-in-out infinite; }
+  .state-idle-stretching .eye { animation: idle-blink 3s ease-in-out infinite; }
+  .state-idle-stretching .mouth {
+    width: 14px; height: 10px;
+    border-bottom: none; border: none;
+    background: #5a3825; border-radius: 50%;
+    top: 56px; left: 53px;
+  }
+
+  /* IDLE - DANCING (Uncommon rare) */
+  .state-idle-dancing .body { animation: idle-dance 0.5s ease-in-out infinite; }
+  .state-idle-dancing .antenna { animation: antenna-sway 0.5s ease-in-out infinite; }
+  .state-idle-dancing .eye { animation: idle-blink 4s ease-in-out infinite; }
+  .state-idle-dancing .foot.left { animation: code-foot-l 0.25s ease-in-out infinite; }
+  .state-idle-dancing .foot.right { animation: code-foot-r 0.25s ease-in-out infinite; }
+  .state-idle-dancing .mouth {
+    width: 20px; height: 10px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 50px;
+  }
+
+  /* IDLE - BUTTERFLY (Rare) */
+  .state-idle-butterfly .body { animation: idle-breathe 3s ease-in-out infinite; }
+  .state-idle-butterfly .antenna { animation: antenna-sway 3s ease-in-out infinite; }
+  .state-idle-butterfly .pupil { animation: butterfly-track 4s ease-in-out infinite; }
+  .state-idle-butterfly .eye { animation: idle-blink 5s ease-in-out infinite; }
+  .state-idle-butterfly .mouth {
+    width: 18px; height: 10px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 57px; left: 51px;
+  }
+
+  /* IDLE - JUGGLING (Rare) */
+  .state-idle-juggling .body { animation: idle-breathe 2s ease-in-out infinite; }
+  .state-idle-juggling .antenna { animation: antenna-sway 2s ease-in-out infinite; }
+  .state-idle-juggling .pupil { animation: juggle-track 1.5s ease-in-out infinite; }
+  .state-idle-juggling .eye { transform: scale(1.1); }
+  .state-idle-juggling .mouth {
+    width: 12px; height: 6px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 58px; left: 54px;
+  }
+
+  /* IDLE - RAINBOW (Epic rare) */
+  .state-idle-rainbow .body { animation: idle-rainbow-body 4s linear infinite; }
+  .state-idle-rainbow .antenna { animation: antenna-sway 2s ease-in-out infinite; }
+  .state-idle-rainbow .antenna::after { animation: rainbow-glow 2s linear infinite; }
+  .state-idle-rainbow .eye { animation: idle-blink 3s ease-in-out infinite; }
+  .state-idle-rainbow .mouth {
+    width: 22px; height: 12px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 49px;
+  }
+  .state-idle-rainbow .foot { animation: idle-rainbow-body 4s linear infinite; }
+
+  /* IDLE - MEDITATION (Epic rare) */
+  .state-idle-meditation .body { animation: meditate-float 3s ease-in-out infinite; }
+  .state-idle-meditation .antenna { animation: antenna-sway 4s ease-in-out infinite; }
+  .state-idle-meditation .antenna::after { animation: meditate-glow 3s ease-in-out infinite; }
+  .state-idle-meditation .eye { animation: meditate-eyes 4s ease-in-out infinite; }
+  .state-idle-meditation .mouth {
+    width: 10px; height: 3px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0 0 40% 40%;
+    top: 60px; left: 55px;
+  }
+
+  @keyframes idle-stretch {
+    0%, 100% { transform: translateY(0) scaleX(1) scaleY(1); }
+    30% { transform: translateY(4px) scaleX(1.15) scaleY(0.85); }
+    60% { transform: translateY(-8px) scaleX(0.9) scaleY(1.15); }
+    80% { transform: translateY(-4px) scaleX(0.95) scaleY(1.08); }
+  }
+  @keyframes idle-dance {
+    0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+    25% { transform: translateX(-6px) translateY(-8px) rotate(-5deg); }
+    50% { transform: translateX(0) translateY(-2px) rotate(0deg); }
+    75% { transform: translateX(6px) translateY(-8px) rotate(5deg); }
+  }
+  @keyframes butterfly-track {
+    0%, 100% { transform: translate(2px, -2px); }
+    25% { transform: translate(3px, -3px); }
+    50% { transform: translate(-2px, -3px); }
+    75% { transform: translate(-3px, -2px); }
+  }
+  @keyframes juggle-track {
+    0%, 100% { transform: translate(-2px, -3px); }
+    33% { transform: translate(2px, -3px); }
+    66% { transform: translate(0, -4px); }
+  }
+  @keyframes idle-rainbow-body {
+    0% { background: radial-gradient(circle at 35% 35%, #ff6b6b, #ee5a24); }
+    16% { background: radial-gradient(circle at 35% 35%, #f9ca24, #f0932b); }
+    33% { background: radial-gradient(circle at 35% 35%, #2ecc71, #009432); }
+    50% { background: radial-gradient(circle at 35% 35%, #74b9ff, #0984e3); }
+    66% { background: radial-gradient(circle at 35% 35%, #a29bfe, #6c5ce7); }
+    83% { background: radial-gradient(circle at 35% 35%, #fd79a8, #e84393); }
+    100% { background: radial-gradient(circle at 35% 35%, #ff6b6b, #ee5a24); }
+  }
+  @keyframes rainbow-glow {
+    0% { box-shadow: 0 0 14px rgba(255,107,107,0.8); background: radial-gradient(circle, #ff6b6b, #ee5a24); }
+    33% { box-shadow: 0 0 14px rgba(46,204,113,0.8); background: radial-gradient(circle, #2ecc71, #009432); }
+    66% { box-shadow: 0 0 14px rgba(162,155,254,0.8); background: radial-gradient(circle, #a29bfe, #6c5ce7); }
+    100% { box-shadow: 0 0 14px rgba(255,107,107,0.8); background: radial-gradient(circle, #ff6b6b, #ee5a24); }
+  }
+  @keyframes meditate-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.02); }
+  }
+  @keyframes meditate-glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(162,155,254,0.5); }
+    50% { box-shadow: 0 0 22px rgba(162,155,254,0.9); }
+  }
+  @keyframes meditate-eyes {
+    0%, 100% { transform: scaleY(0.15); }
+    50% { transform: scaleY(0.1); }
   }
 
   /* THINKING */
@@ -544,6 +838,547 @@
     50% { transform: translateY(-25px) scale(1.08); }
   }
 
+  /* ── RARE ACTIVITY VARIANT ANIMATIONS ─────────────────────── */
+
+  /* CODING - FLOW (Uncommon) — golden glow laptop, warm sparkles */
+  .state-coding-flow .body {
+    animation: code-type 0.35s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #f9ca24, #f0932b);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 8px 30px rgba(249,202,36,0.3);
+  }
+  .state-coding-flow .mouth {
+    width: 18px; height: 10px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 51px;
+  }
+  .state-coding-flow .pupil { animation: code-eyes 2s ease-in-out infinite; }
+  .state-coding-flow .foot.left { animation: code-foot-l 0.2s ease-in-out infinite; }
+  .state-coding-flow .foot.right { animation: code-foot-r 0.2s ease-in-out infinite; }
+  .state-coding-flow .antenna::after {
+    background: radial-gradient(circle, #ffd700, #f9ca24);
+    box-shadow: 0 0 20px rgba(255,215,0,0.8);
+    animation: flow-glow 1.5s ease-in-out infinite;
+  }
+  @keyframes flow-glow {
+    0%, 100% { box-shadow: 0 0 14px rgba(255,215,0,0.6); }
+    50% { box-shadow: 0 0 28px rgba(255,215,0,1); }
+  }
+
+  /* CODING - HACKING (Epic) — green body, matrix rain */
+  .state-coding-hacking .body {
+    animation: code-type 0.25s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #2ecc71, #009432);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 8px 30px rgba(46,204,113,0.3);
+  }
+  .state-coding-hacking .mouth {
+    width: 10px; height: 10px; border: none;
+    background: #1a5c2a; border-radius: 50%;
+    top: 57px; left: 55px;
+  }
+  .state-coding-hacking .pupil { animation: code-eyes 1.5s ease-in-out infinite; }
+  .state-coding-hacking .foot.left { animation: code-foot-l 0.15s ease-in-out infinite; }
+  .state-coding-hacking .foot.right { animation: code-foot-r 0.15s ease-in-out infinite; }
+  .state-coding-hacking .foot { background: #27ae60; }
+  .state-coding-hacking .antenna::after {
+    background: radial-gradient(circle, #2ecc71, #009432);
+    box-shadow: 0 0 20px rgba(46,204,113,0.8);
+    animation: hack-glow 0.8s ease-in-out infinite;
+  }
+  @keyframes hack-glow {
+    0%, 100% { box-shadow: 0 0 14px rgba(46,204,113,0.6); }
+    50% { box-shadow: 0 0 24px rgba(0,255,65,1); }
+  }
+
+  /* THINKING - EUREKA (Uncommon) — lightbulb, excited bounce */
+  .state-thinking-eureka .body {
+    animation: eureka-bounce 0.6s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #ffeaa7, #fdcb6e);
+  }
+  .state-thinking-eureka .antenna::after {
+    background: radial-gradient(circle, #ffd700, #f9ca24);
+    box-shadow: 0 0 24px rgba(255,215,0,0.9);
+    animation: eureka-flash 0.4s ease-in-out infinite;
+  }
+  .state-thinking-eureka .eye { animation: idle-blink 3s ease-in-out infinite; }
+  .state-thinking-eureka .mouth {
+    width: 18px; height: 12px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 55px; left: 51px;
+  }
+  @keyframes eureka-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.05); }
+  }
+  @keyframes eureka-flash {
+    0%, 100% { box-shadow: 0 0 16px rgba(255,215,0,0.7); }
+    50% { box-shadow: 0 0 34px rgba(255,215,0,1); }
+  }
+
+  /* THINKING - GALAXY BRAIN (Epic) — purple cosmic glow, orbital rings */
+  .state-thinking-galaxy .body {
+    animation: galaxy-pulse 2s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #a29bfe, #6c5ce7);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 0 30px rgba(108,92,231,0.4);
+  }
+  .state-thinking-galaxy .foot { background: #6c5ce7; }
+  .state-thinking-galaxy .antenna::after {
+    background: radial-gradient(circle, #d5ccff, #a29bfe);
+    box-shadow: 0 0 22px rgba(162,155,254,0.9);
+    animation: galaxy-antenna 2s ease-in-out infinite;
+  }
+  .state-thinking-galaxy .pupil { animation: think-look-up 3s ease-in-out infinite; }
+  .state-thinking-galaxy .mouth {
+    width: 14px; height: 10px;
+    border-bottom: none; border: none;
+    background: #3c2a6e; border-radius: 50%;
+    top: 56px; left: 53px;
+  }
+  @keyframes galaxy-pulse {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.04) translateY(-5px); }
+  }
+  @keyframes galaxy-antenna {
+    0%, 100% { box-shadow: 0 0 16px rgba(162,155,254,0.7); }
+    50% { box-shadow: 0 0 30px rgba(162,155,254,1); }
+  }
+
+  /* THINKING THEMES — cosmetic variants, random on each thinking entry */
+
+  /* THINKING - COOKING — warm orange, gentle simmer bob */
+  .state-thinking-cooking .body {
+    animation: think-ponder 2.5s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #f0932b, #e17055);
+  }
+  .state-thinking-cooking .foot { background: #e17055; }
+  .state-thinking-cooking .antenna::after {
+    background: radial-gradient(circle, #ffeaa7, #f0932b);
+    box-shadow: 0 0 12px rgba(240,147,43,0.6);
+    animation: think-glow 1.2s ease-in-out infinite;
+  }
+  .state-thinking-cooking .pupil { animation: think-look-up 3s ease-in-out infinite; }
+  .state-thinking-cooking .mouth {
+    width: 14px; height: 7px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 58px; left: 53px;
+  }
+
+  /* THINKING - ACTION — red-warm, stomping determination */
+  .state-thinking-action .body {
+    animation: action-stomp 0.6s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #e17055, #d63031);
+  }
+  .state-thinking-action .foot { background: #d63031; }
+  .state-thinking-action .foot.left { animation: code-foot-l 0.3s ease-in-out infinite; }
+  .state-thinking-action .foot.right { animation: code-foot-r 0.3s ease-in-out infinite; }
+  .state-thinking-action .antenna::after {
+    background: radial-gradient(circle, #ff7675, #d63031);
+    box-shadow: 0 0 14px rgba(214,48,49,0.7);
+    animation: think-glow 0.8s ease-in-out infinite;
+  }
+  .state-thinking-action .pupil { animation: think-look-up 2s ease-in-out infinite; }
+  .state-thinking-action .eye { transform: scaleY(0.85); }
+  .state-thinking-action .mouth {
+    width: 14px; height: 3px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0;
+    top: 59px; left: 53px;
+  }
+  @keyframes action-stomp {
+    0%, 100% { transform: translateY(0) scale(1); }
+    30% { transform: translateY(-4px) scale(1.03); }
+    60% { transform: translateY(1px) scale(0.98); }
+  }
+
+  /* THINKING - CREATING — orange-red, focused crafting */
+  .state-thinking-creating .body {
+    animation: think-ponder 2.5s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #e17055, #c0392b);
+  }
+  .state-thinking-creating .foot { background: #c0392b; }
+  .state-thinking-creating .antenna::after {
+    background: radial-gradient(circle, #fdcb6e, #e17055);
+    box-shadow: 0 0 14px rgba(225,112,85,0.7);
+    animation: think-glow 1s ease-in-out infinite;
+  }
+  .state-thinking-creating .pupil { animation: think-look-up 3s ease-in-out infinite; }
+  .state-thinking-creating .eye { transform: scaleY(0.9); }
+  .state-thinking-creating .mouth {
+    width: 10px; height: 3px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0;
+    top: 60px; left: 55px;
+  }
+
+  /* THINKING - PROCESSING — teal, digital pulse */
+  .state-thinking-processing .body {
+    animation: process-pulse 1.5s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #00cec9, #0984e3);
+  }
+  .state-thinking-processing .foot { background: #0984e3; }
+  .state-thinking-processing .antenna::after {
+    background: radial-gradient(circle, #81ecec, #00cec9);
+    box-shadow: 0 0 16px rgba(0,206,201,0.8);
+    animation: process-antenna 1.5s linear infinite;
+  }
+  .state-thinking-processing .pupil { animation: code-eyes 2s ease-in-out infinite; }
+  .state-thinking-processing .mouth {
+    width: 10px; height: 10px; border: none;
+    background: #065e5c; border-radius: 50%;
+    top: 57px; left: 55px;
+  }
+  @keyframes process-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  @keyframes process-antenna {
+    0% { box-shadow: 0 0 10px rgba(0,206,201,0.4); }
+    50% { box-shadow: 0 0 22px rgba(0,206,201,1); }
+    100% { box-shadow: 0 0 10px rgba(0,206,201,0.4); }
+  }
+
+  /* THINKING - GROWING — green, gentle float upward */
+  .state-thinking-growing .body {
+    animation: grow-float 3s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #55efc4, #00b894);
+  }
+  .state-thinking-growing .foot { background: #00b894; }
+  .state-thinking-growing .antenna::after {
+    background: radial-gradient(circle, #55efc4, #00b894);
+    box-shadow: 0 0 12px rgba(0,184,148,0.6);
+    animation: think-glow 2s ease-in-out infinite;
+  }
+  .state-thinking-growing .pupil { animation: think-look-up 4s ease-in-out infinite; }
+  .state-thinking-growing .mouth {
+    width: 14px; height: 7px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 58px; left: 53px;
+  }
+  @keyframes grow-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-5px) scale(1.02); }
+  }
+
+  /* THINKING - MAGICAL — purple-gold, mystical glow */
+  .state-thinking-magical .body {
+    animation: magic-float 2.5s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #a29bfe, #6c5ce7);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 0 18px rgba(108,92,231,0.3);
+  }
+  .state-thinking-magical .foot { background: #6c5ce7; }
+  .state-thinking-magical .antenna::after {
+    background: radial-gradient(circle, #ffd700, #f9ca24);
+    box-shadow: 0 0 18px rgba(255,215,0,0.8);
+    animation: magic-antenna 2s ease-in-out infinite;
+  }
+  .state-thinking-magical .pupil { animation: think-look-up 3s ease-in-out infinite; }
+  .state-thinking-magical .mouth {
+    width: 12px; height: 5px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0 0 40% 40%;
+    top: 59px; left: 54px;
+  }
+  @keyframes magic-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-6px) rotate(1deg); }
+  }
+  @keyframes magic-antenna {
+    0%, 100% { box-shadow: 0 0 12px rgba(255,215,0,0.5); }
+    50% { box-shadow: 0 0 26px rgba(255,215,0,1); }
+  }
+
+  /* THINKING - SILLY — rainbow-bright, bouncy wobble */
+  .state-thinking-silly .body {
+    animation: silly-wobble 0.8s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #fd79a8, #e84393);
+  }
+  .state-thinking-silly .foot { background: #e84393; }
+  .state-thinking-silly .foot.left { animation: code-foot-l 0.4s ease-in-out infinite; }
+  .state-thinking-silly .foot.right { animation: code-foot-r 0.4s ease-in-out infinite; }
+  .state-thinking-silly .antenna::after {
+    background: radial-gradient(circle, #ffeaa7, #fdcb6e);
+    box-shadow: 0 0 14px rgba(253,203,110,0.7);
+    animation: silly-antenna 0.6s ease-in-out infinite;
+  }
+  .state-thinking-silly .pupil { animation: think-eyes 1.5s ease-in-out infinite; }
+  .state-thinking-silly .mouth {
+    width: 18px; height: 10px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 51px;
+  }
+  @keyframes silly-wobble {
+    0%, 100% { transform: rotate(-3deg) translateY(0); }
+    25% { transform: rotate(3deg) translateY(-4px); }
+    50% { transform: rotate(-2deg) translateY(0); }
+    75% { transform: rotate(2deg) translateY(-3px); }
+  }
+  @keyframes silly-antenna {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+  }
+
+  /* THINKING - EXPLORING — amber-warm, peeking side-to-side */
+  .state-thinking-exploring .body {
+    animation: explore-peek 3s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #fdcb6e, #f0932b);
+  }
+  .state-thinking-exploring .foot { background: #f0932b; }
+  .state-thinking-exploring .antenna::after {
+    background: radial-gradient(circle, #ffeaa7, #fdcb6e);
+    box-shadow: 0 0 14px rgba(253,203,110,0.7);
+    animation: think-glow 1.5s ease-in-out infinite;
+  }
+  .state-thinking-exploring .pupil { animation: search-scan 2.5s ease-in-out infinite; }
+  .state-thinking-exploring .mouth {
+    width: 12px; height: 5px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0 0 40% 40%;
+    top: 59px; left: 54px;
+  }
+  @keyframes explore-peek {
+    0%, 100% { transform: translateX(0) scale(1); }
+    30% { transform: translateX(-5px) scale(1.02); }
+    70% { transform: translateX(5px) scale(1.02); }
+  }
+
+  /* DEBUGGING - DETECTIVE (Uncommon) — deerstalker hat, focused scan */
+  .state-debugging-detective .body {
+    animation: debug-hunt 0.8s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #fdcb6e, #e17055);
+  }
+  .state-debugging-detective .eye { transform: scale(1.3); }
+  .state-debugging-detective .pupil { width: 5px; height: 5px; top: 6px; animation: search-scan 2s ease-in-out infinite; }
+  .state-debugging-detective .mouth {
+    width: 14px; height: 3px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0;
+    top: 59px; left: 53px;
+  }
+  .state-debugging-detective .antenna::after {
+    background: radial-gradient(circle, #fdcb6e, #f0932b);
+    box-shadow: 0 0 14px rgba(240,147,43,0.7);
+  }
+
+  /* DEBUGGING - RAGE (Epic) — red body, violent shaking, steam */
+  .state-debugging-rage .body {
+    animation: rage-shake 0.15s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #ff4757, #c0392b);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 0 20px rgba(255,71,87,0.3);
+  }
+  .state-debugging-rage .foot { background: #c0392b; }
+  .state-debugging-rage .eye { animation: error-squint 0.4s ease-in-out infinite; }
+  .state-debugging-rage .mouth {
+    border-bottom: none;
+    border-top: 3px solid #5a3825;
+    border-radius: 50% 50% 0 0;
+    top: 58px; width: 18px; left: 51px;
+  }
+  .state-debugging-rage .antenna::after {
+    background: radial-gradient(circle, #ff4757, #c0392b);
+    box-shadow: 0 0 20px rgba(255,71,87,0.9);
+    animation: rage-antenna 0.3s ease-in-out infinite;
+  }
+  .state-debugging-rage .foot.left { animation: code-foot-l 0.1s ease-in-out infinite; }
+  .state-debugging-rage .foot.right { animation: code-foot-r 0.1s ease-in-out infinite; }
+  @keyframes rage-shake {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(-4px) translateY(-2px); }
+    50% { transform: translateX(4px) translateY(-1px); }
+    75% { transform: translateX(-3px) translateY(-2px); }
+  }
+  @keyframes rage-antenna {
+    0%, 100% { box-shadow: 0 0 14px rgba(255,71,87,0.7); }
+    50% { box-shadow: 0 0 28px rgba(255,71,87,1); }
+  }
+
+  /* SEARCHING - TREASURE HUNT (Uncommon) — treasure map, gold sparkles */
+  .state-searching-treasure .body { animation: search-peer 1.4s ease-in-out infinite; }
+  .state-searching-treasure .eye { transform: scale(1.2); }
+  .state-searching-treasure .pupil { animation: search-scan 1.4s ease-in-out infinite; }
+  .state-searching-treasure .mouth {
+    width: 16px; height: 10px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 52px;
+  }
+  .state-searching-treasure .antenna::after {
+    background: radial-gradient(circle, #ffd700, #f9ca24);
+    box-shadow: 0 0 14px rgba(255,215,0,0.7);
+  }
+  .state-searching-treasure .foot.left { animation: code-foot-l 0.35s ease-in-out infinite; }
+  .state-searching-treasure .foot.right { animation: code-foot-r 0.35s ease-in-out infinite; }
+
+  /* SEARCHING - DEEP DIVE (Epic) — blue body, diving goggles, bubbles */
+  .state-searching-deep .body {
+    animation: deep-dive-bob 2s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #74b9ff, #0984e3);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 0 20px rgba(9,132,227,0.3);
+  }
+  .state-searching-deep .foot { background: #0984e3; }
+  .state-searching-deep .eye { transform: scale(1.2); }
+  .state-searching-deep .pupil { animation: search-scan 2s ease-in-out infinite; }
+  .state-searching-deep .mouth {
+    width: 10px; height: 8px; border: none;
+    background: #043d6e; border-radius: 50%;
+    top: 58px; left: 55px;
+  }
+  .state-searching-deep .antenna::after {
+    background: radial-gradient(circle, #74b9ff, #0984e3);
+    box-shadow: 0 0 16px rgba(116,185,255,0.8);
+  }
+  @keyframes deep-dive-bob {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.02); }
+  }
+
+  /* READING - SCHOLAR (Uncommon) — book stack + glasses, page particles */
+  .state-reading-scholar .body { animation: read-lean 3s ease-in-out infinite; }
+  .state-reading-scholar .pupil { animation: read-eyes 2s steps(3) infinite; }
+  .state-reading-scholar .mouth {
+    width: 10px; height: 5px;
+    border-bottom: 2px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 59px; left: 55px;
+  }
+  .state-reading-scholar .antenna::after {
+    background: radial-gradient(circle, #a29bfe, #6c5ce7);
+    box-shadow: 0 0 16px rgba(108,92,231,0.7);
+  }
+
+  /* READING - ANCIENT SCROLL (Epic) — golden body, glowing scroll, runes */
+  .state-reading-ancient .body {
+    animation: ancient-breathe 3s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #f9ca24, #d4a020);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 0 20px rgba(212,160,32,0.3);
+  }
+  .state-reading-ancient .foot { background: #d4a020; }
+  .state-reading-ancient .pupil { animation: read-eyes 3s steps(3) infinite; }
+  .state-reading-ancient .mouth {
+    width: 10px; height: 8px; border: none;
+    background: #7a5a10; border-radius: 50%;
+    top: 57px; left: 55px;
+  }
+  .state-reading-ancient .antenna::after {
+    background: radial-gradient(circle, #ffd700, #f0d070);
+    box-shadow: 0 0 22px rgba(255,215,0,0.9);
+    animation: ancient-glow 2s ease-in-out infinite;
+  }
+  @keyframes ancient-breathe {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-3px) rotate(0.5deg); }
+  }
+  @keyframes ancient-glow {
+    0%, 100% { box-shadow: 0 0 14px rgba(255,215,0,0.6); }
+    50% { box-shadow: 0 0 28px rgba(255,215,0,1); }
+  }
+
+  /* TESTING - SCIENTIST (Uncommon) — bubbling test tube, colorful liquids */
+  .state-testing-scientist .body { animation: test-nod 0.8s ease-in-out infinite; }
+  .state-testing-scientist .mouth {
+    width: 14px; height: 8px;
+    border-bottom: 3px solid #5a3825;
+    border-radius: 0 0 50% 50%;
+    top: 57px; left: 53px;
+  }
+  .state-testing-scientist .pupil { animation: test-check 1.6s steps(2) infinite; }
+  .state-testing-scientist .antenna::after {
+    background: radial-gradient(circle, #00cec9, #00b894);
+    box-shadow: 0 0 14px rgba(0,206,201,0.7);
+    animation: scientist-glow 1.5s ease-in-out infinite;
+  }
+  @keyframes scientist-glow {
+    0%, 100% { box-shadow: 0 0 12px rgba(0,206,201,0.6); }
+    33% { box-shadow: 0 0 18px rgba(255,107,107,0.7); }
+    66% { box-shadow: 0 0 18px rgba(162,155,254,0.7); }
+  }
+
+  /* TESTING - PERFECTIONIST (Epic) — green body, checkmarks rain */
+  .state-testing-perfectionist .body {
+    animation: test-nod 0.6s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #2ecc71, #00b894);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 0 20px rgba(46,204,113,0.3);
+  }
+  .state-testing-perfectionist .foot { background: #00b894; }
+  .state-testing-perfectionist .mouth {
+    width: 20px; height: 10px;
+    border-bottom: 3px solid #1a5c2a;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 50px;
+  }
+  .state-testing-perfectionist .pupil { animation: test-check 1.2s steps(2) infinite; }
+  .state-testing-perfectionist .eye { animation: idle-blink 3s ease-in-out infinite; }
+  .state-testing-perfectionist .antenna::after {
+    background: radial-gradient(circle, #2ecc71, #00b894);
+    box-shadow: 0 0 20px rgba(46,204,113,0.9);
+    animation: perfect-glow 0.8s ease-in-out infinite;
+  }
+  @keyframes perfect-glow {
+    0%, 100% { box-shadow: 0 0 14px rgba(46,204,113,0.6); }
+    50% { box-shadow: 0 0 26px rgba(46,204,113,1); }
+  }
+
+  /* DEPLOYING - WARP SPEED (Uncommon) — body stretches, speed lines */
+  .state-deploying-warp .body {
+    animation: warp-stretch 0.8s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #fab1a0, #e17055);
+  }
+  .state-deploying-warp .mouth {
+    width: 12px; height: 12px; border: none;
+    background: #5a3825; border-radius: 50%;
+    top: 55px; left: 54px;
+  }
+  .state-deploying-warp .antenna::after {
+    background: radial-gradient(circle, #ff7675, #d63031);
+    box-shadow: 0 0 22px rgba(214,48,49,0.9);
+  }
+  .state-deploying-warp .shadow { animation: success-shadow 0.8s ease-in-out infinite; }
+  @keyframes warp-stretch {
+    0%, 100% { transform: translateY(0) scaleY(1) scaleX(1); }
+    30% { transform: translateY(-20px) scaleY(1.3) scaleX(0.85); }
+    60% { transform: translateY(-10px) scaleY(1.1) scaleX(0.95); }
+  }
+
+  /* DEPLOYING - SATELLITE (Epic) — moon + orbiting satellite, space stars */
+  .state-deploying-satellite .body {
+    animation: satellite-float 2s ease-in-out infinite;
+    background: radial-gradient(circle at 35% 35%, #dfe6e9, #b2bec3);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.1),
+                0 0 20px rgba(116,185,255,0.2);
+  }
+  .state-deploying-satellite .foot { background: #b2bec3; }
+  .state-deploying-satellite .mouth {
+    width: 14px; height: 10px;
+    border-bottom: none; border: none;
+    background: #5a3825; border-radius: 50%;
+    top: 56px; left: 53px;
+  }
+  .state-deploying-satellite .shadow { animation: success-shadow 2s ease-in-out infinite; }
+  .state-deploying-satellite .antenna::after {
+    background: radial-gradient(circle, #ffeaa7, #fdcb6e);
+    box-shadow: 0 0 18px rgba(253,203,110,0.8);
+    animation: satellite-antenna 2s ease-in-out infinite;
+  }
+  @keyframes satellite-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-18px) scale(1.04); }
+  }
+  @keyframes satellite-antenna {
+    0%, 100% { box-shadow: 0 0 14px rgba(253,203,110,0.6); }
+    50% { box-shadow: 0 0 24px rgba(253,203,110,1); }
+  }
+
   /* COOKING */
   .state-cooking .body {
     animation: cook-stir 0.6s ease-in-out infinite;
@@ -667,10 +1502,17 @@
       <div class="mouth"></div>
       <div class="foot left"></div>
       <div class="foot right"></div>
+      <div class="milestone-layer" id="milestoneLayer"></div>
       <div class="accessory-layer" id="accessoryLayer"></div>
       <div class="particle-layer" id="particleLayer"></div>
     </div>
-    <div class="shadow"></div>
+    <div class="skill-label" id="skillLabel">CHILLING LV.1</div>
+    <div class="xp-row">
+      <div class="level-badge" id="levelBadge">1</div>
+      <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+    </div>
+    <div class="confetti-layer" id="confettiLayer"></div>
+    <div class="stats-tooltip" id="statsTooltip"></div>
   </div>
 
   <script>
@@ -679,8 +1521,65 @@
     const label = document.getElementById("statusLabel");
     const accessoryLayer = document.getElementById("accessoryLayer");
     const particleLayer = document.getElementById("particleLayer");
+    const milestoneLayer = document.getElementById("milestoneLayer");
+    const xpFill = document.getElementById("xpFill");
+    const levelBadge = document.getElementById("levelBadge");
+    const creature = document.getElementById("creature");
     let currentState = "idle";
     let particleInterval = null;
+    const skillLabel = document.getElementById("skillLabel");
+    let currentTier = 0;
+    let unlockedMilestones = new Set();
+    let lastProgression = null;
+
+    // Map state → display name for the skill label
+    const STATE_SKILL_NAME = {
+      idle: "Chilling", "idle-vibing": "Vibing", "idle-sleepy": "Sleepy",
+      "idle-coffee": "Coffee", "idle-stargazing": "Stargazing",
+      "idle-stretching": "Stretching", "idle-dancing": "Dancing",
+      "idle-butterfly": "Wondering", "idle-juggling": "Juggling",
+      "idle-rainbow": "Rainbow", "idle-meditation": "Meditating",
+      thinking: "Thinking", coding: "Coding", searching: "Searching",
+      reading: "Reading", debugging: "Debugging", installing: "Installing",
+      testing: "Testing", deploying: "Deploying", cooking: "Cooking",
+      hatching: "Hatching", deleting: "Cleaning", downloading: "Downloading",
+      success: "Success", error: "Error",
+      "coding-flow": "Flow", "coding-hacking": "Hacking",
+      "thinking-eureka": "Eureka", "thinking-galaxy": "Galaxy Brain",
+      "thinking-cooking": "Cooking", "thinking-action": "Action",
+      "thinking-creating": "Creating", "thinking-processing": "Processing",
+      "thinking-growing": "Growing", "thinking-magical": "Magical",
+      "thinking-silly": "Silly", "thinking-exploring": "Exploring",
+      "debugging-detective": "Detective", "debugging-rage": "Rage",
+      "searching-treasure": "Treasure Hunt", "searching-deep": "Deep Diving",
+      "reading-scholar": "Scholar", "reading-ancient": "Arcana",
+      "testing-scientist": "Science", "testing-perfectionist": "Perfectionism",
+      "deploying-warp": "Warp", "deploying-satellite": "Astronaut",
+    };
+    // Map state → which skill key to show level for (null = pet level)
+    const STATE_SKILL_KEY = {
+      idle: null, "idle-vibing": null, "idle-sleepy": null,
+      "idle-coffee": null, "idle-stargazing": null,
+      "idle-stretching": "stretching", "idle-dancing": "dancing",
+      "idle-butterfly": "wondering", "idle-juggling": "juggling",
+      "idle-rainbow": "rainbow", "idle-meditation": "meditating",
+      thinking: "thinking", coding: "coding", searching: "searching",
+      reading: "reading", debugging: "debugging", installing: "installing",
+      testing: "testing", deploying: "deploying", cooking: null,
+      hatching: null, deleting: null, downloading: null,
+      success: null, error: null,
+      "coding-flow": "flow", "coding-hacking": "hacking",
+      "thinking-eureka": "eureka", "thinking-galaxy": "galaxy brain",
+      "thinking-cooking": "thinking", "thinking-action": "thinking",
+      "thinking-creating": "thinking", "thinking-processing": "thinking",
+      "thinking-growing": "thinking", "thinking-magical": "thinking",
+      "thinking-silly": "thinking", "thinking-exploring": "thinking",
+      "debugging-detective": "detective", "debugging-rage": "rage",
+      "searching-treasure": "treasure hunting", "searching-deep": "deep diving",
+      "reading-scholar": "scholarship", "reading-ancient": "arcana",
+      "testing-scientist": "science", "testing-perfectionist": "perfectionism",
+      "deploying-warp": "warp", "deploying-satellite": "astronaut",
+    };
 
     // ── SVG PARTICLE SHAPES ─────────────────────────────────────────
     // Tiny reusable SVG templates. Use COLOR as a placeholder to tint.
@@ -787,6 +1686,118 @@
         particles: {
           items: [SVG.star("#74b9ff"), SVG.sparkle("#a29bfe"), SVG.star("#ffeaa7"), SVG.dot("#dfe6e9")],
           anim: "sway-float", rate: 1000,
+        },
+      },
+
+      "idle-stretching": {
+        label: "stretching~",
+        accessory: null,
+        particles: {
+          items: [SVG.sparkle("#fdcb6e"), SVG.sparkle("#f0932b"), SVG.cloud("#ffeaa7")],
+          anim: "sway-float", rate: 1200,
+        },
+      },
+
+      "idle-dancing": {
+        label: "dancing!",
+        accessory: `<svg viewBox="0 0 24 24" width="20" height="20" style="top:-16px;left:48px;">
+          <circle cx="12" cy="12" r="8" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
+          <line x1="12" y1="4" x2="12" y2="20" stroke="#b2bec3" stroke-width="0.5"/>
+          <line x1="4" y1="12" x2="20" y2="12" stroke="#b2bec3" stroke-width="0.5"/>
+          <line x1="6" y1="6" x2="18" y2="18" stroke="#b2bec3" stroke-width="0.5"/>
+          <line x1="18" y1="6" x2="6" y2="18" stroke="#b2bec3" stroke-width="0.5"/>
+          <circle cx="12" cy="12" r="8" fill="none" stroke="#fff" stroke-width="0.5" opacity="0.5">
+            <animate attributeName="r" values="6;9;6" dur="1s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.5;0;0.5" dur="1s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: {
+          items: [
+            `<span style="color:#ff6b6b;font-size:14px;font-family:serif">&#9835;</span>`,
+            `<span style="color:#f9ca24;font-size:12px;font-family:serif">&#9834;</span>`,
+            `<span style="color:#2ecc71;font-size:13px;font-family:serif">&#9835;</span>`,
+            `<span style="color:#74b9ff;font-size:11px;font-family:serif">&#9834;</span>`,
+            SVG.sparkle("#f9ca24"),
+            SVG.sparkle("#ff6b6b"),
+          ],
+          anim: "sway-float", rate: 500,
+        },
+      },
+
+      "idle-butterfly": {
+        label: "butterfly!",
+        accessory: `<svg viewBox="0 0 30 24" width="24" height="20" style="top:10px;left:80px;">
+          <g>
+            <animateTransform attributeName="transform" type="translate" values="0,0;-10,-8;-20,0;-10,8;0,0" dur="4s" repeatCount="indefinite"/>
+            <ellipse cx="15" cy="12" rx="8" ry="6" fill="#fd79a8" opacity="0.7">
+              <animate attributeName="ry" values="6;2;6" dur="0.5s" repeatCount="indefinite"/>
+            </ellipse>
+            <ellipse cx="15" cy="12" rx="5" ry="8" fill="#a29bfe" opacity="0.7">
+              <animate attributeName="rx" values="5;1.5;5" dur="0.5s" repeatCount="indefinite"/>
+            </ellipse>
+            <ellipse cx="15" cy="12" rx="1" ry="4" fill="#2c1810"/>
+            <circle cx="15" cy="7.5" r="1.5" fill="#2c1810"/>
+          </g>
+        </svg>`,
+        particles: {
+          items: [SVG.sparkle("#fd79a8"), SVG.dot("#a29bfe"), SVG.sparkle("#ffeaa7")],
+          anim: "sway-float", rate: 1600,
+        },
+      },
+
+      "idle-juggling": {
+        label: "juggling!",
+        accessory: `<svg viewBox="0 0 60 40" width="50" height="34" style="top:-20px;left:34px;">
+          <circle cx="15" cy="20" r="5" fill="#ff6b6b">
+            <animate attributeName="cx" values="15;30;45;30;15" dur="1.5s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="20;5;20;5;20" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="30" cy="5" r="5" fill="#f9ca24">
+            <animate attributeName="cx" values="30;45;30;15;30" dur="1.5s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="5;20;5;20;5" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="45" cy="20" r="5" fill="#74b9ff">
+            <animate attributeName="cx" values="45;30;15;30;45" dur="1.5s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="20;5;20;5;20" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: null,
+      },
+
+      "idle-rainbow": {
+        label: "rainbow!",
+        accessory: `<svg viewBox="0 0 80 40" width="70" height="36" style="top:-24px;left:24px;">
+          <path d="M5,38 Q40,-5 75,38" fill="none" stroke="#ff6b6b" stroke-width="3" opacity="0.7"/>
+          <path d="M8,38 Q40,-2 72,38" fill="none" stroke="#f9ca24" stroke-width="3" opacity="0.7"/>
+          <path d="M11,38 Q40,1 69,38" fill="none" stroke="#2ecc71" stroke-width="3" opacity="0.7"/>
+          <path d="M14,38 Q40,4 66,38" fill="none" stroke="#74b9ff" stroke-width="3" opacity="0.7"/>
+          <path d="M17,38 Q40,7 63,38" fill="none" stroke="#a29bfe" stroke-width="3" opacity="0.7"/>
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+        </svg>`,
+        particles: {
+          items: [
+            SVG.sparkle("#ff6b6b"), SVG.sparkle("#f9ca24"), SVG.sparkle("#2ecc71"),
+            SVG.sparkle("#74b9ff"), SVG.sparkle("#a29bfe"), SVG.sparkle("#fd79a8"),
+            SVG.star("#ff6b6b"), SVG.star("#f9ca24"), SVG.star("#2ecc71"),
+          ],
+          anim: "sway-float", rate: 300,
+        },
+      },
+
+      "idle-meditation": {
+        label: "meditating...",
+        accessory: `<svg viewBox="0 0 60 60" width="50" height="50" style="top:5px;left:34px;">
+          <g opacity="0.4">
+            <animateTransform attributeName="transform" type="rotate" values="0 30 30;360 30 30" dur="12s" repeatCount="indefinite"/>
+            <circle cx="30" cy="30" r="25" fill="none" stroke="#a29bfe" stroke-width="1" stroke-dasharray="4 4"/>
+            <circle cx="30" cy="30" r="18" fill="none" stroke="#6c5ce7" stroke-width="1" stroke-dasharray="3 6"/>
+            <circle cx="30" cy="30" r="11" fill="none" stroke="#a29bfe" stroke-width="1.5" stroke-dasharray="2 4"/>
+            <path d="M30,5 L30,55 M5,30 L55,30 M12,12 L48,48 M48,12 L12,48" stroke="#d5ccff" stroke-width="0.5"/>
+          </g>
+        </svg>`,
+        particles: {
+          items: [SVG.dot("#a29bfe"), SVG.dot("#d5ccff"), SVG.sparkle("#6c5ce7")],
+          anim: "orbit", rate: 1200,
         },
       },
 
@@ -909,6 +1920,481 @@
         particles: {
           items: [SVG.cross("#e74c3c"), SVG.tri("#e17055"), SVG.sparkle("#ff7675"), SVG.bolt("#e74c3c")],
           anim: "crack-shake", rate: 600,
+        },
+      },
+
+      // ── RARE ACTIVITY VARIANTS ────────────────────────────────────
+
+      "coding-flow": {
+        label: "in the zone! (coding)",
+        // Golden glow laptop
+        accessory: `<svg viewBox="0 0 50 28" width="46" height="26" style="top:68px;left:37px;">
+          <rect x="7" y="0" width="36" height="18" rx="2" fill="#ffd700" opacity="0.15">
+            <animate attributeName="opacity" values="0.1;0.25;0.1" dur="1.5s" repeatCount="indefinite"/>
+          </rect>
+          <rect x="7" y="0" width="36" height="18" rx="2" fill="#f5f5f7" stroke="#d4a020" stroke-width="0.8"/>
+          <ellipse cx="25" cy="9" rx="3" ry="3.6" fill="#ffd700" opacity="0.5">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+          </ellipse>
+          <rect x="9" y="0" width="32" height="1.5" rx="0.75" fill="#ffd700" opacity="0.3">
+            <animate attributeName="opacity" values="0.15;0.45;0.15" dur="1.5s" repeatCount="indefinite"/>
+          </rect>
+          <rect x="7" y="18" width="36" height="1.2" rx="0.5" fill="#d4a020"/>
+          <rect x="7" y="19.2" width="36" height="7" rx="1" fill="#f5f5f7" stroke="#d4a020" stroke-width="0.5"/>
+          <rect x="18" y="22.5" width="14" height="3" rx="1" fill="#e8e8ed" stroke="#d4a020" stroke-width="0.4"/>
+        </svg>`,
+        particles: {
+          items: [SVG.sparkle("#ffd700"), SVG.sparkle("#f9ca24"), SVG.star("#ffd700"), SVG.sparkle("#ffbe76")],
+          anim: "float-up", rate: 500,
+        },
+      },
+
+      "coding-hacking": {
+        label: "hacking! (coding)",
+        // Sunglasses SVG
+        accessory: `<svg viewBox="0 0 44 16" width="40" height="14" style="top:34px;left:28px;">
+          <rect x="2" y="4" width="14" height="10" rx="2" fill="rgba(0,0,0,0.85)" stroke="#2ecc71" stroke-width="0.5"/>
+          <rect x="28" y="4" width="14" height="10" rx="2" fill="rgba(0,0,0,0.85)" stroke="#2ecc71" stroke-width="0.5"/>
+          <line x1="16" y1="8" x2="28" y2="8" stroke="#2c1810" stroke-width="1.5"/>
+          <line x1="2" y1="7" x2="-2" y2="5" stroke="#2c1810" stroke-width="1"/>
+          <line x1="42" y1="7" x2="46" y2="5" stroke="#2c1810" stroke-width="1"/>
+          <rect x="4" y="6" width="10" height="6" rx="1" fill="#2ecc71" opacity="0.15">
+            <animate attributeName="opacity" values="0.1;0.25;0.1" dur="1s" repeatCount="indefinite"/>
+          </rect>
+          <rect x="30" y="6" width="10" height="6" rx="1" fill="#2ecc71" opacity="0.15">
+            <animate attributeName="opacity" values="0.1;0.25;0.1" dur="1s" repeatCount="indefinite"/>
+          </rect>
+        </svg>`,
+        particles: {
+          items: [
+            `<span style="color:#2ecc71;font-size:11px;font-weight:bold;font-family:monospace;text-shadow:0 0 6px rgba(46,204,113,0.7)">0</span>`,
+            `<span style="color:#00ff41;font-size:10px;font-weight:bold;font-family:monospace;text-shadow:0 0 6px rgba(0,255,65,0.5)">1</span>`,
+            `<span style="color:#2ecc71;font-size:9px;font-family:monospace;text-shadow:0 0 4px rgba(46,204,113,0.5)">0</span>`,
+            `<span style="color:#00ff41;font-size:12px;font-weight:bold;font-family:monospace;text-shadow:0 0 6px rgba(0,255,65,0.7)">1</span>`,
+            SVG.sparkle("#2ecc71"),
+          ],
+          anim: "rain-down", rate: 300,
+        },
+      },
+
+      "thinking-eureka": {
+        label: "eureka! (thinking)",
+        // Glowing lightbulb
+        accessory: `<svg viewBox="0 0 24 32" width="20" height="28" style="top:-18px;left:48px;">
+          <ellipse cx="12" cy="12" rx="9" ry="10" fill="#ffd700" opacity="0.2">
+            <animate attributeName="opacity" values="0.15;0.35;0.15" dur="1s" repeatCount="indefinite"/>
+            <animate attributeName="rx" values="9;12;9" dur="1s" repeatCount="indefinite"/>
+            <animate attributeName="ry" values="10;13;10" dur="1s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="12" cy="12" rx="7" ry="8" fill="#ffeaa7" stroke="#f9ca24" stroke-width="1"/>
+          <rect x="9" y="20" width="6" height="4" rx="1" fill="#b2bec3"/>
+          <line x1="9" y1="22" x2="15" y2="22" stroke="#636e72" stroke-width="0.5"/>
+          <path d="M10,8 L10,14 M14,8 L14,14" stroke="#f0932b" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="12" cy="6" r="1.5" fill="#ffd700">
+            <animate attributeName="r" values="1;2;1" dur="0.8s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: {
+          items: [SVG.sparkle("#ffd700"), SVG.star("#ffeaa7"), SVG.bolt("#f9ca24"), SVG.sparkle("#f0932b")],
+          anim: "pop-up", rate: 600,
+        },
+      },
+
+      "thinking-galaxy": {
+        label: "galaxy brain! (thinking)",
+        // Orbital rings
+        accessory: `<svg viewBox="0 0 70 70" width="60" height="60" style="top:-5px;left:28px;">
+          <g opacity="0.5">
+            <animateTransform attributeName="transform" type="rotate" values="0 35 35;360 35 35" dur="8s" repeatCount="indefinite"/>
+            <ellipse cx="35" cy="35" rx="30" ry="10" fill="none" stroke="#a29bfe" stroke-width="1" stroke-dasharray="4 3"/>
+          </g>
+          <g opacity="0.4">
+            <animateTransform attributeName="transform" type="rotate" values="90 35 35;450 35 35" dur="10s" repeatCount="indefinite"/>
+            <ellipse cx="35" cy="35" rx="25" ry="8" fill="none" stroke="#6c5ce7" stroke-width="1" stroke-dasharray="3 4"/>
+          </g>
+          <g opacity="0.3">
+            <animateTransform attributeName="transform" type="rotate" values="45 35 35;405 35 35" dur="6s" repeatCount="indefinite"/>
+            <ellipse cx="35" cy="35" rx="20" ry="6" fill="none" stroke="#d5ccff" stroke-width="1.5"/>
+          </g>
+        </svg>`,
+        particles: {
+          items: [SVG.star("#a29bfe"), SVG.sparkle("#6c5ce7"), SVG.dot("#d5ccff"), SVG.star("#ffeaa7")],
+          anim: "orbit", rate: 600,
+        },
+      },
+
+      // ── THINKING THEMES (cosmetic variants) ─────────────────────
+
+      "thinking-cooking": {
+        labels: ["baking...", "brewing...", "simmering...", "stewing...", "marinating...", "percolating..."],
+        label: "simmering...",
+        // Chef hat
+        accessory: `<svg viewBox="0 0 36 28" width="32" height="24" style="top:0px;left:32px;">
+          <ellipse cx="18" cy="22" rx="16" ry="4" fill="#f5f0e0"/>
+          <rect x="6" y="6" width="24" height="16" rx="3" fill="#fff" stroke="#e0d8c0" stroke-width="0.8"/>
+          <ellipse cx="18" cy="6" rx="10" ry="5" fill="#fff"/>
+          <line x1="18" y1="2" x2="18" y2="5" stroke="#e0d8c0" stroke-width="0.8"/>
+        </svg>`,
+        particles: {
+          items: [
+            SVG.cloud("#dfe6e9"), SVG.cloud("#b2bec3"),
+            SVG.sparkle("#f0932b"), SVG.sparkle("#ffeaa7"),
+          ],
+          anim: "float-up", rate: 800,
+        },
+      },
+
+      "thinking-action": {
+        labels: ["hustling...", "wrangling...", "mustering...", "working...", "accomplishing..."],
+        label: "hustling...",
+        // Flexed arm
+        accessory: `<svg viewBox="0 0 28 28" width="24" height="24" style="top:28px;left:88px;">
+          <path d="M4,24 L8,14 L14,10 L16,4 L20,6 L16,12 L18,14 L14,18 L10,24Z" fill="#e17055" stroke="#d63031" stroke-width="0.8"/>
+          <ellipse cx="17" cy="5" rx="3" ry="2.5" fill="#e17055"/>
+        </svg>`,
+        particles: {
+          items: [SVG.bolt("#ff7675"), SVG.sparkle("#fdcb6e"), SVG.bolt("#d63031"), SVG.sparkle("#ff7675")],
+          anim: "pop-up", rate: 500,
+        },
+      },
+
+      "thinking-creating": {
+        labels: ["crafting...", "forging...", "tinkering...", "conjuring...", "concocting..."],
+        label: "forging...",
+        // Hammer & anvil
+        accessory: `<svg viewBox="0 0 34 28" width="30" height="24" style="top:66px;left:72px;">
+          <rect x="6" y="18" width="22" height="6" rx="1" fill="#636e72"/>
+          <rect x="4" y="16" width="26" height="4" rx="1" fill="#95a5a6"/>
+          <rect x="22" y="4" width="4" height="14" rx="1" fill="#b2bec3" transform="rotate(15,24,11)"/>
+          <rect x="18" y="2" width="12" height="5" rx="2" fill="#dfe6e9" transform="rotate(15,24,4)"/>
+          <circle cx="24" cy="14" r="1.5" fill="#fdcb6e">
+            <animate attributeName="opacity" values="1;0.3;1" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: {
+          items: [SVG.sparkle("#fdcb6e"), SVG.sparkle("#e17055"), SVG.bolt("#f0932b"), SVG.dot("#ff7675")],
+          anim: "pop-up", rate: 400,
+        },
+      },
+
+      "thinking-processing": {
+        labels: ["computing...", "crunching...", "calculating...", "synthesizing...", "deciphering..."],
+        label: "computing...",
+        // Spinning gear
+        accessory: `<svg viewBox="0 0 28 28" width="24" height="24" style="top:-12px;left:46px;">
+          <g>
+            <animateTransform attributeName="transform" type="rotate" values="0 14 14;360 14 14" dur="4s" repeatCount="indefinite"/>
+            <circle cx="14" cy="14" r="6" fill="none" stroke="#00cec9" stroke-width="2.5"/>
+            <circle cx="14" cy="14" r="3" fill="#0984e3"/>
+            <rect x="12.5" y="1" width="3" height="5" rx="1" fill="#00cec9"/>
+            <rect x="12.5" y="22" width="3" height="5" rx="1" fill="#00cec9"/>
+            <rect x="1" y="12.5" width="5" height="3" rx="1" fill="#00cec9"/>
+            <rect x="22" y="12.5" width="5" height="3" rx="1" fill="#00cec9"/>
+          </g>
+        </svg>`,
+        particles: {
+          items: [
+            `<span style="color:#00cec9;font-size:11px;font-weight:bold;font-family:monospace;text-shadow:0 0 6px rgba(0,206,201,0.7)">0</span>`,
+            `<span style="color:#0984e3;font-size:10px;font-weight:bold;font-family:monospace;text-shadow:0 0 6px rgba(9,132,227,0.5)">1</span>`,
+            `<span style="color:#00cec9;font-size:9px;font-family:monospace;text-shadow:0 0 4px rgba(0,206,201,0.5)">0</span>`,
+            `<span style="color:#0984e3;font-size:12px;font-weight:bold;font-family:monospace;text-shadow:0 0 6px rgba(9,132,227,0.7)">1</span>`,
+            SVG.gear("#00cec9"),
+          ],
+          anim: "rain-down", rate: 350,
+        },
+      },
+
+      "thinking-growing": {
+        labels: ["germinating...", "incubating...", "hatching...", "unfurling...", "coalescing..."],
+        label: "germinating...",
+        // Sprout from head
+        accessory: `<svg viewBox="0 0 24 28" width="20" height="24" style="top:-8px;left:50px;">
+          <line x1="12" y1="28" x2="12" y2="12" stroke="#00b894" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="8" cy="10" rx="6" ry="4" fill="#55efc4" transform="rotate(-20,8,10)"/>
+          <ellipse cx="16" cy="8" rx="5" ry="3.5" fill="#00b894" transform="rotate(15,16,8)"/>
+          <circle cx="12" cy="5" r="2" fill="#55efc4" opacity="0.6">
+            <animate attributeName="r" values="1.5;2.5;1.5" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: {
+          items: [
+            `<span style="color:#55efc4;font-size:11px">&#127793;</span>`,
+            SVG.dot("#00b894"), SVG.dot("#55efc4"),
+            `<span style="color:#00b894;font-size:10px">&#127807;</span>`,
+          ],
+          anim: "sway-float", rate: 1000,
+        },
+      },
+
+      "thinking-magical": {
+        labels: ["wizarding...", "enchanting...", "divining...", "manifesting...", "channelling..."],
+        label: "wizarding...",
+        // Wizard hat + wand
+        accessory: `<svg viewBox="0 0 36 36" width="32" height="32" style="top:-6px;left:30px;">
+          <polygon points="18,0 8,28 28,28" fill="#6c5ce7" stroke="#a29bfe" stroke-width="0.8"/>
+          <ellipse cx="18" cy="28" rx="14" ry="3" fill="#6c5ce7"/>
+          <circle cx="18" cy="8" r="2.5" fill="#ffd700">
+            <animate attributeName="r" values="2;3;2" dur="1.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <line x1="30" y1="20" x2="36" y2="8" stroke="#f9ca24" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="36" cy="7" r="2" fill="#ffd700">
+            <animate attributeName="r" values="1.5;2.5;1.5" dur="0.8s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: {
+          items: [SVG.sparkle("#ffd700"), SVG.star("#a29bfe"), SVG.sparkle("#f9ca24"), SVG.star("#d5ccff")],
+          anim: "orbit", rate: 500,
+        },
+      },
+
+      "thinking-silly": {
+        labels: ["booping...", "frolicking...", "wibbling...", "combobulating...", "jiving...", "vibing..."],
+        label: "booping...",
+        // Party hat
+        accessory: `<svg viewBox="0 0 24 28" width="20" height="24" style="top:-4px;left:48px;">
+          <polygon points="12,0 4,24 20,24" fill="#fd79a8"/>
+          <line x1="4" y1="10" x2="20" y2="10" stroke="#ffeaa7" stroke-width="1.5"/>
+          <line x1="4" y1="16" x2="20" y2="16" stroke="#74b9ff" stroke-width="1.5"/>
+          <circle cx="12" cy="0" r="3" fill="#ffeaa7">
+            <animate attributeName="r" values="2;3.5;2" dur="1s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: {
+          items: [
+            SVG.dot("#fd79a8"), SVG.dot("#74b9ff"), SVG.dot("#ffeaa7"),
+            SVG.tri("#55efc4"), SVG.diamond("#fdcb6e"), SVG.dot("#a29bfe"),
+          ],
+          anim: "pop-up", rate: 300,
+        },
+      },
+
+      "thinking-exploring": {
+        labels: ["spelunking...", "wandering...", "meandering...", "perusing...", "elucidating..."],
+        label: "spelunking...",
+        // Lantern
+        accessory: `<svg viewBox="0 0 20 28" width="18" height="24" style="top:30px;left:88px;">
+          <rect x="6" y="4" width="8" height="3" rx="1" fill="#636e72"/>
+          <rect x="4" y="7" width="12" height="14" rx="2" fill="#fdcb6e" opacity="0.3" stroke="#f0932b" stroke-width="0.8"/>
+          <ellipse cx="10" cy="14" rx="3" ry="4" fill="#ffd700" opacity="0.8">
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite"/>
+          </ellipse>
+          <rect x="4" y="21" width="12" height="2" rx="1" fill="#636e72"/>
+          <line x1="10" y1="1" x2="10" y2="4" stroke="#636e72" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>`,
+        particles: {
+          items: [SVG.dot("#f0932b"), SVG.dot("#fdcb6e"), SVG.dot("#dfe6e9"), SVG.sparkle("#ffeaa7")],
+          anim: "sway-float", rate: 900,
+        },
+      },
+
+      "debugging-detective": {
+        label: "detective! (debugging)",
+        // Deerstalker hat
+        accessory: `<svg viewBox="0 0 40 22" width="36" height="18" style="top:2px;left:30px;">
+          <ellipse cx="20" cy="18" rx="18" ry="4" fill="#8B6914"/>
+          <ellipse cx="20" cy="12" rx="14" ry="8" fill="#b8860b"/>
+          <ellipse cx="20" cy="10" rx="12" ry="6" fill="#d4a020"/>
+          <rect x="4" y="14" width="6" height="6" rx="2" fill="#b8860b" transform="rotate(-15,7,17)"/>
+          <rect x="30" y="14" width="6" height="6" rx="2" fill="#b8860b" transform="rotate(15,33,17)"/>
+        </svg>`,
+        particles: {
+          items: [
+            `<span style="color:#f0932b;font-size:13px">&#128065;</span>`,
+            SVG.sparkle("#fdcb6e"), SVG.dot("#f0932b"),
+            `<span style="color:#8B6914;font-size:10px">&#9737;</span>`,
+          ],
+          anim: "wiggle-float", rate: 1000,
+        },
+      },
+
+      "debugging-rage": {
+        label: "RAGE! (debugging)",
+        accessory: null,
+        particles: {
+          items: [
+            `<span style="color:#ff4757;font-size:14px;font-weight:bold">&#128545;</span>`,
+            `<span style="color:#ff6348;font-size:11px;font-weight:bold">!!</span>`,
+            SVG.cross("#ff4757"), SVG.bolt("#ff6348"),
+            SVG.cloud("#b2bec3"),
+          ],
+          anim: "pop-up", rate: 400,
+        },
+      },
+
+      "searching-treasure": {
+        label: "treasure hunt! (searching)",
+        // Treasure map
+        accessory: `<svg viewBox="0 0 30 24" width="26" height="22" style="top:-6px;left:72px;">
+          <rect x="2" y="2" width="26" height="20" rx="2" fill="#ffeaa7" stroke="#f0932b" stroke-width="1"/>
+          <path d="M6,8 L10,12 L18,6 L22,16" fill="none" stroke="#d4a020" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 2"/>
+          <circle cx="22" cy="16" r="2" fill="#ff6b6b">
+            <animate attributeName="r" values="1.5;2.5;1.5" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <text x="21" y="18" font-size="5" fill="#c0392b" font-weight="bold">X</text>
+        </svg>`,
+        particles: {
+          items: [SVG.sparkle("#ffd700"), SVG.star("#f9ca24"), SVG.diamond("#ffd700"), SVG.sparkle("#f0932b")],
+          anim: "sway-float", rate: 700,
+        },
+      },
+
+      "searching-deep": {
+        label: "deep dive! (searching)",
+        // Diving goggles
+        accessory: `<svg viewBox="0 0 44 18" width="38" height="16" style="top:32px;left:28px;">
+          <circle cx="12" cy="9" r="7" fill="rgba(116,185,255,0.2)" stroke="#0984e3" stroke-width="1.5"/>
+          <circle cx="32" cy="9" r="7" fill="rgba(116,185,255,0.2)" stroke="#0984e3" stroke-width="1.5"/>
+          <path d="M19,9 Q22,12 25,9" stroke="#0984e3" stroke-width="1.5" fill="none"/>
+          <line x1="5" y1="6" x2="1" y2="5" stroke="#0984e3" stroke-width="1.2"/>
+          <line x1="39" y1="6" x2="43" y2="5" stroke="#0984e3" stroke-width="1.2"/>
+        </svg>`,
+        particles: {
+          items: [
+            SVG.dot("#74b9ff"), SVG.ring("#0984e3"),
+            SVG.dot("#a29bfe"), SVG.dot("#55efc4"),
+          ],
+          anim: "float-up", rate: 600,
+        },
+      },
+
+      "reading-scholar": {
+        label: "scholar! (reading)",
+        // Book stack + glasses
+        accessory: `<svg viewBox="0 0 36 36" width="30" height="30" style="top:60px;left:42px;">
+          <rect x="2" y="22" width="32" height="5" rx="1" fill="#e17055" stroke="#d63031" stroke-width="0.5"/>
+          <rect x="4" y="17" width="28" height="5" rx="1" fill="#0984e3" stroke="#0652DD" stroke-width="0.5"/>
+          <rect x="3" y="12" width="30" height="5" rx="1" fill="#6c5ce7" stroke="#4834d4" stroke-width="0.5"/>
+          <path d="M3,7 L17,5 L17,12 L3,12Z" fill="#a29bfe" stroke="#6c5ce7" stroke-width="0.5"/>
+          <path d="M17,5 L33,7 L33,12 L17,12Z" fill="#d5ccff" stroke="#6c5ce7" stroke-width="0.5"/>
+          <line x1="17" y1="5" x2="17" y2="12" stroke="#6c5ce7" stroke-width="1"/>
+        </svg>`,
+        particles: {
+          items: [SVG.page("#a29bfe"), SVG.page("#6c5ce7"), SVG.sparkle("#d5ccff"), SVG.star("#a29bfe")],
+          anim: "sway-float", rate: 1200,
+        },
+      },
+
+      "reading-ancient": {
+        label: "ancient scroll! (reading)",
+        // Glowing scroll
+        accessory: `<svg viewBox="0 0 36 32" width="30" height="26" style="top:62px;left:42px;">
+          <rect x="6" y="4" width="24" height="24" fill="#ffeaa7" stroke="#d4a020" stroke-width="1"/>
+          <circle cx="6" cy="4" r="4" fill="#f0d070" stroke="#d4a020" stroke-width="0.8"/>
+          <circle cx="6" cy="28" r="4" fill="#f0d070" stroke="#d4a020" stroke-width="0.8"/>
+          <circle cx="30" cy="4" r="4" fill="#f0d070" stroke="#d4a020" stroke-width="0.8"/>
+          <circle cx="30" cy="28" r="4" fill="#f0d070" stroke="#d4a020" stroke-width="0.8"/>
+          <text x="10" y="14" font-size="6" fill="#d4a020" font-family="serif" opacity="0.7">&#x2625;</text>
+          <text x="20" y="14" font-size="6" fill="#d4a020" font-family="serif" opacity="0.7">&#x2626;</text>
+          <text x="14" y="22" font-size="6" fill="#d4a020" font-family="serif" opacity="0.7">&#x2627;</text>
+          <rect x="6" y="4" width="24" height="24" fill="#ffd700" opacity="0">
+            <animate attributeName="opacity" values="0;0.15;0" dur="2s" repeatCount="indefinite"/>
+          </rect>
+        </svg>`,
+        particles: {
+          items: [
+            `<span style="color:#d4a020;font-size:12px;font-family:serif;opacity:0.8">&#x2625;</span>`,
+            `<span style="color:#f0d070;font-size:11px;font-family:serif;opacity:0.7">&#x2626;</span>`,
+            SVG.sparkle("#ffd700"), SVG.star("#d4a020"),
+          ],
+          anim: "sway-float", rate: 900,
+        },
+      },
+
+      "testing-scientist": {
+        label: "science! (testing)",
+        // Bubbling test tube
+        accessory: `<svg viewBox="0 0 20 34" width="16" height="28" style="top:-8px;left:80px;">
+          <rect x="6" y="0" width="8" height="4" rx="1" fill="#b2bec3"/>
+          <path d="M6,4 L4,26 Q4,30 10,30 Q16,30 16,26 L14,4Z" fill="rgba(116,185,255,0.3)" stroke="#0984e3" stroke-width="1"/>
+          <ellipse cx="10" cy="24" rx="5" ry="3" fill="#2ecc71" opacity="0.6">
+            <animate attributeName="opacity" values="0.4;0.7;0.4" dur="1.5s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="10" cy="20" rx="4" ry="2" fill="#a29bfe" opacity="0.5">
+            <animate attributeName="cy" values="20;18;20" dur="2s" repeatCount="indefinite"/>
+          </ellipse>
+          <circle cx="8" cy="16" r="1.5" fill="#ff6b6b" opacity="0.6">
+            <animate attributeName="cy" values="16;12;16" dur="1.8s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="12" cy="14" r="1" fill="#f9ca24" opacity="0.5">
+            <animate attributeName="cy" values="14;10;14" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>`,
+        particles: {
+          items: [SVG.dot("#2ecc71"), SVG.dot("#a29bfe"), SVG.dot("#ff6b6b"), SVG.dot("#f9ca24"), SVG.sparkle("#00cec9")],
+          anim: "float-up", rate: 700,
+        },
+      },
+
+      "testing-perfectionist": {
+        label: "100% coverage! (testing)",
+        // Green glowing clipboard
+        accessory: `<svg viewBox="0 0 28 34" width="22" height="26" style="top:-8px;left:76px;">
+          <rect x="2" y="4" width="24" height="28" rx="2" fill="#2ecc71" stroke="#00b894" stroke-width="1.2"/>
+          <rect x="8" y="0" width="12" height="6" rx="2" fill="#00b894"/>
+          <rect x="10" y="1.5" width="8" height="3" rx="1" fill="#2ecc71"/>
+          <path d="M6,13 L8.5,15.5 L13,11" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6,20 L8.5,22.5 L13,18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6,27 L8.5,29.5 L13,25" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="15" y="16" font-size="7" fill="#fff" font-weight="bold" font-family="monospace">&#10003;</text>
+          <text x="15" y="23" font-size="7" fill="#fff" font-weight="bold" font-family="monospace">&#10003;</text>
+          <text x="15" y="30" font-size="7" fill="#fff" font-weight="bold" font-family="monospace">&#10003;</text>
+        </svg>`,
+        particles: {
+          items: [SVG.check("#2ecc71"), SVG.check("#00b894"), SVG.check("#55efc4"), SVG.star("#2ecc71"), SVG.sparkle("#00b894")],
+          anim: "rain-down", rate: 500,
+        },
+      },
+
+      "deploying-warp": {
+        label: "warp speed! (deploying)",
+        // Speed lines
+        accessory: `<svg viewBox="0 0 80 60" width="70" height="52" style="top:10px;left:24px;">
+          <line x1="0" y1="20" x2="25" y2="20" stroke="#ff7675" stroke-width="2" opacity="0.6">
+            <animate attributeName="x1" values="-10;30;-10" dur="0.8s" repeatCount="indefinite"/>
+            <animate attributeName="x2" values="15;55;15" dur="0.8s" repeatCount="indefinite"/>
+          </line>
+          <line x1="5" y1="30" x2="30" y2="30" stroke="#fdcb6e" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="x1" values="-5;35;-5" dur="0.6s" repeatCount="indefinite"/>
+            <animate attributeName="x2" values="20;60;20" dur="0.6s" repeatCount="indefinite"/>
+          </line>
+          <line x1="0" y1="40" x2="20" y2="40" stroke="#ff7675" stroke-width="2" opacity="0.6">
+            <animate attributeName="x1" values="-15;25;-15" dur="0.7s" repeatCount="indefinite"/>
+            <animate attributeName="x2" values="10;50;10" dur="0.7s" repeatCount="indefinite"/>
+          </line>
+          <line x1="55" y1="25" x2="80" y2="25" stroke="#fdcb6e" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="x1" values="50;20;50" dur="0.7s" repeatCount="indefinite"/>
+            <animate attributeName="x2" values="75;45;75" dur="0.7s" repeatCount="indefinite"/>
+          </line>
+          <line x1="60" y1="35" x2="80" y2="35" stroke="#ff7675" stroke-width="2" opacity="0.6">
+            <animate attributeName="x1" values="55;25;55" dur="0.65s" repeatCount="indefinite"/>
+            <animate attributeName="x2" values="80;50;80" dur="0.65s" repeatCount="indefinite"/>
+          </line>
+        </svg>`,
+        particles: {
+          items: [SVG.bolt("#fdcb6e"), SVG.bolt("#ff7675"), SVG.sparkle("#e17055"), SVG.sparkle("#fdcb6e")],
+          anim: "float-up", rate: 250,
+        },
+      },
+
+      "deploying-satellite": {
+        label: "to the moon! (deploying)",
+        // Moon + orbiting satellite
+        accessory: `<svg viewBox="0 0 60 60" width="50" height="50" style="top:-20px;left:34px;">
+          <circle cx="30" cy="30" r="12" fill="#ffeaa7" stroke="#f0d070" stroke-width="1"/>
+          <circle cx="26" cy="26" r="3" fill="#f0d070" opacity="0.5"/>
+          <circle cx="34" cy="32" r="2" fill="#f0d070" opacity="0.4"/>
+          <circle cx="28" cy="34" r="1.5" fill="#f0d070" opacity="0.3"/>
+          <g>
+            <animateTransform attributeName="transform" type="rotate" values="0 30 30;360 30 30" dur="4s" repeatCount="indefinite"/>
+            <rect x="48" y="28" width="6" height="4" rx="1" fill="#b2bec3" stroke="#636e72" stroke-width="0.5"/>
+            <line x1="46" y1="30" x2="48" y2="30" stroke="#74b9ff" stroke-width="0.8"/>
+            <line x1="54" y1="30" x2="56" y2="30" stroke="#74b9ff" stroke-width="0.8"/>
+          </g>
+        </svg>`,
+        particles: {
+          items: [SVG.star("#ffeaa7"), SVG.sparkle("#f0d070"), SVG.dot("#74b9ff"), SVG.star("#a29bfe")],
+          anim: "orbit", rate: 800,
         },
       },
 
@@ -1109,6 +2595,56 @@
 
     // ── IDLE MOOD CYCLING ─────────────────────────────────────────
     const IDLE_VARIANTS = ["idle", "idle-vibing", "idle-sleepy", "idle-coffee", "idle-stargazing"];
+    const RARE_IDLE_VARIANTS = [
+      { key: "idle-stretching", chance: 0.08 },
+      { key: "idle-dancing",    chance: 0.08 },
+      { key: "idle-butterfly",  chance: 0.05 },
+      { key: "idle-juggling",   chance: 0.05 },
+      { key: "idle-rainbow",    chance: 0.02 },
+      { key: "idle-meditation", chance: 0.02 },
+    ];
+    // Activity rare variants — roll once on state entry, persist for duration
+    const ACTIVITY_RARE_VARIANTS = {
+      coding: [
+        { key: "coding-flow",    chance: 0.12 },
+        { key: "coding-hacking", chance: 0.04 },
+      ],
+      thinking: [
+        { key: "thinking-eureka", chance: 0.12 },
+        { key: "thinking-galaxy", chance: 0.04 },
+      ],
+      debugging: [
+        { key: "debugging-detective", chance: 0.12 },
+        { key: "debugging-rage",      chance: 0.04 },
+      ],
+      searching: [
+        { key: "searching-treasure", chance: 0.12 },
+        { key: "searching-deep",     chance: 0.04 },
+      ],
+      reading: [
+        { key: "reading-scholar", chance: 0.12 },
+        { key: "reading-ancient", chance: 0.04 },
+      ],
+      testing: [
+        { key: "testing-scientist",     chance: 0.12 },
+        { key: "testing-perfectionist", chance: 0.04 },
+      ],
+      deploying: [
+        { key: "deploying-warp",      chance: 0.12 },
+        { key: "deploying-satellite", chance: 0.04 },
+      ],
+    };
+
+    // Themed thinking variants — picked when no rare variant triggers
+    const THINKING_THEMES = [
+      "thinking-cooking", "thinking-action", "thinking-creating",
+      "thinking-processing", "thinking-growing", "thinking-magical",
+      "thinking-silly", "thinking-exploring",
+    ];
+
+    let currentBaseState = null; // tracks the base activity to prevent re-rolling
+    let currentActivityVariant = null; // the rolled variant key (or null)
+
     let idleCycleTimer = null;
     let idleCycleIndex = 0;
 
@@ -1123,13 +2659,35 @@
     }
 
     function applyIdleMood() {
-      const variant = IDLE_VARIANTS[idleCycleIndex];
-      const config = ANIMATIONS[variant];
-      scene.className = "scene state-" + variant;
+      // Roll for a rare idle variant (30% total chance)
+      const roll = Math.random();
+      let cumulative = 0;
+      let rareVariant = null;
+      for (const rv of RARE_IDLE_VARIANTS) {
+        cumulative += rv.chance;
+        if (roll < cumulative) {
+          rareVariant = rv.key;
+          break;
+        }
+      }
+
+      let variant, config;
+      if (rareVariant) {
+        variant = rareVariant;
+        config = ANIMATIONS[variant];
+        ipcRenderer.send("idle-variant-change", variant);
+      } else {
+        variant = IDLE_VARIANTS[idleCycleIndex];
+        config = ANIMATIONS[variant];
+        ipcRenderer.send("idle-variant-change", "idle");
+      }
+
+      scene.className = "scene state-" + variant + " tier-" + currentTier;
       label.textContent = config.label;
       currentState = variant;
       updateAccessories(config);
       updateParticles(config);
+      updateSkillLabel();
     }
 
     function stopIdleCycle() {
@@ -1142,24 +2700,67 @@
     // ── STATE MANAGEMENT ────────────────────────────────────────────
 
     function setState(state) {
-      const config = ANIMATIONS[state] || ANIMATIONS["thinking"];
-      const effectiveState = ANIMATIONS[state] ? state : "thinking";
+      const baseConfig = ANIMATIONS[state] || ANIMATIONS["thinking"];
+      const baseState = ANIMATIONS[state] ? state : "thinking";
 
       const wasIdle = currentState.startsWith("idle");
-      const goingIdle = effectiveState === "idle";
+      const goingIdle = baseState === "idle";
 
       if (!goingIdle && wasIdle) stopIdleCycle();
-      if (goingIdle && !wasIdle) { startIdleCycle(); return; }
+      if (goingIdle && !wasIdle) {
+        currentBaseState = null;
+        currentActivityVariant = null;
+        ipcRenderer.send("activity-variant-change", null);
+        startIdleCycle();
+        return;
+      }
       if (goingIdle && wasIdle) return;
 
-      if (currentState === effectiveState) return;
+      // Same base state as before — keep current variant, don't re-roll
+      if (baseState === currentBaseState) return;
 
-      scene.className = "scene state-" + effectiveState;
+      // New base state — roll for a rare variant
+      currentBaseState = baseState;
+      currentActivityVariant = null;
+
+      let effectiveState = baseState;
+      let config = baseConfig;
+
+      const variants = ACTIVITY_RARE_VARIANTS[baseState];
+      if (variants) {
+        const roll = Math.random();
+        let cumulative = 0;
+        for (const rv of variants) {
+          cumulative += rv.chance;
+          if (roll < cumulative) {
+            effectiveState = rv.key;
+            config = ANIMATIONS[rv.key] || baseConfig;
+            currentActivityVariant = rv.key;
+            break;
+          }
+        }
+      }
+
+      // If base state is "thinking" and no rare variant hit, pick a random theme
+      if (baseState === "thinking" && !currentActivityVariant) {
+        const theme = THINKING_THEMES[Math.floor(Math.random() * THINKING_THEMES.length)];
+        effectiveState = theme;
+        config = ANIMATIONS[theme];
+        // Pick random label from pool
+        if (config.labels) {
+          config = { ...config, label: config.labels[Math.floor(Math.random() * config.labels.length)] };
+        }
+      }
+
+      ipcRenderer.send("activity-variant-change", currentActivityVariant);
+
+      scene.className = "scene state-" + effectiveState + " tier-" + currentTier;
       label.textContent = config.label || effectiveState;
       currentState = effectiveState;
 
       updateAccessories(config);
       updateParticles(config);
+      updateSkillLabel();
     }
 
     function updateAccessories(config) {
@@ -1203,15 +2804,285 @@
       particleInterval = setInterval(spawnParticle, rate);
     }
 
+    // ── PROGRESSION UI ────────────────────────────────────────────
+
+    const TIER_BADGE_COLORS = [
+      "rgba(0,0,0,0.5)",    // Hatchling
+      "#cd7f32",            // Apprentice (copper)
+      "#7ba3bf",            // Adept (silver-blue)
+      "#d4a020",            // Expert (gold)
+      "#c77f84",            // Master (rose gold)
+      "#6c5ce7",            // Legendary (purple)
+    ];
+
+    // Milestone accessories: { key, condition(skills, level), svg }
+    const MILESTONES = [
+      {
+        key: "glasses",
+        test: (s, l) => s.coding && s.coding.level >= 5,
+        svg: `<svg viewBox="0 0 40 16" width="36" height="14" style="top:38px;left:32px;">
+          <circle cx="12" cy="8" r="6" fill="none" stroke="#2c1810" stroke-width="1.5"/>
+          <circle cx="28" cy="8" r="6" fill="none" stroke="#2c1810" stroke-width="1.5"/>
+          <line x1="18" y1="8" x2="22" y2="8" stroke="#2c1810" stroke-width="1.5"/>
+          <line x1="6" y1="8" x2="2" y2="6" stroke="#2c1810" stroke-width="1"/>
+          <line x1="34" y1="8" x2="38" y2="6" stroke="#2c1810" stroke-width="1"/>
+          <circle cx="12" cy="8" r="6" fill="rgba(116,185,255,0.1)"/>
+          <circle cx="28" cy="8" r="6" fill="rgba(116,185,255,0.1)"/>
+        </svg>`,
+      },
+      {
+        key: "magnifier",
+        test: (s, l) => s.debugging && s.debugging.level >= 3,
+        svg: `<svg viewBox="0 0 18 18" width="14" height="14" style="top:14px;left:96px;">
+          <circle cx="8" cy="8" r="5" fill="none" stroke="#e84393" stroke-width="1.5"/>
+          <line x1="12" y1="12" x2="16" y2="16" stroke="#e84393" stroke-width="2" stroke-linecap="round"/>
+        </svg>`,
+      },
+      {
+        key: "book",
+        test: (s, l) => s.reading && s.reading.level >= 5,
+        svg: `<svg viewBox="0 0 14 12" width="12" height="10" style="top:96px;left:70px;">
+          <path d="M1,1 L7,0 L7,10 L1,9Z" fill="#a29bfe" stroke="#6c5ce7" stroke-width="0.5"/>
+          <path d="M7,0 L13,1 L13,9 L7,10Z" fill="#d5ccff" stroke="#6c5ce7" stroke-width="0.5"/>
+        </svg>`,
+      },
+      {
+        key: "cap",
+        test: () => false, // hidden for now
+        svg: `<svg viewBox="0 0 28 20" width="30" height="20" style="top:4px;left:45px;">
+          <rect x="2" y="10" width="24" height="4" rx="1" fill="#2c1810"/>
+          <polygon points="14,0 2,10 26,10" fill="#2c1810"/>
+          <line x1="20" y1="6" x2="24" y2="14" stroke="#f0932b" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="24" cy="15" r="2" fill="#f0932b"/>
+        </svg>`,
+      },
+      {
+        key: "rocket",
+        test: (s, l) => s.deploying && s.deploying.level >= 5,
+        svg: `<svg viewBox="0 0 14 18" width="10" height="14" style="top:10px;left:100px;">
+          <ellipse cx="7" cy="8" rx="4" ry="8" fill="#dfe6e9"/>
+          <ellipse cx="7" cy="6" rx="3" ry="5" fill="#74b9ff"/>
+          <circle cx="7" cy="5" r="1.5" fill="#0984e3"/>
+          <path d="M3,12 L2,16 L5,14Z" fill="#e17055"/>
+          <path d="M11,12 L12,16 L9,14Z" fill="#e17055"/>
+        </svg>`,
+      },
+      {
+        key: "crown",
+        test: (s, l) => l >= 25,
+        svg: `<svg viewBox="0 0 32 20" width="28" height="16" style="top:-4px;left:36px;">
+          <polygon points="2,18 4,6 10,12 16,2 22,12 28,6 30,18" fill="#f0d070" stroke="#d4a020" stroke-width="1"/>
+          <circle cx="4" cy="6" r="2" fill="#f0d070"/>
+          <circle cx="16" cy="2" r="2" fill="#f0d070"/>
+          <circle cx="28" cy="6" r="2" fill="#f0d070"/>
+          <rect x="2" y="16" width="28" height="3" rx="1" fill="#d4a020"/>
+        </svg>`,
+      },
+    ];
+
+    const statsTooltip = document.getElementById("statsTooltip");
+    const SKILL_COLORS = {
+      coding: "#74b9ff", debugging: "#fd79a8", thinking: "#f0932b",
+      searching: "#0984e3", reading: "#a29bfe", testing: "#ffeaa7",
+      deploying: "#ff7675", installing: "#00cec9",
+      stretching: "#f0932b", dancing: "#ff6b6b",
+      wondering: "#fd79a8", juggling: "#f9ca24",
+      rainbow: "#ff6b6b", meditating: "#a29bfe",
+      flow: "#ffd700", hacking: "#2ecc71",
+      eureka: "#ffd700", "galaxy brain": "#a29bfe",
+      detective: "#d4a020", rage: "#ff4757",
+      "treasure hunting": "#ffd700", "deep diving": "#0984e3",
+      scholarship: "#6c5ce7", arcana: "#d4a020",
+      science: "#00cec9", perfectionism: "#2ecc71",
+      warp: "#ff7675", astronaut: "#ffeaa7",
+    };
+
+    function updateStatsTooltip() {
+      if (!lastProgression) return;
+      const p = lastProgression;
+      const tierNames = ["Hatchling","Apprentice","Adept","Expert","Master","Legendary"];
+      const tier = p.tierIndex || 0;
+      let html = `<div class="stats-title">Lv.${p.level} ${tierNames[tier]}</div>`;
+      for (const [name, s] of Object.entries(p.skills)) {
+        const needed = Math.floor(100 * s.level * 1.2);
+        const pct = Math.min(100, (s.xp / needed) * 100);
+        const col = SKILL_COLORS[name] || "#fff";
+        html += `<div class="stat-row">
+          <span class="stat-name">${name}</span>
+          <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+          <span class="stat-lv" style="color:${col}">${s.level}</span>
+        </div>`;
+      }
+      statsTooltip.innerHTML = html;
+    }
+
+    function updateSkillLabel() {
+      const name = STATE_SKILL_NAME[currentState] || "Chilling";
+      const key = STATE_SKILL_KEY[currentState];
+      let lv = lastProgression ? lastProgression.level : 1;
+      if (key && lastProgression && lastProgression.skills[key]) {
+        lv = lastProgression.skills[key].level;
+      }
+      skillLabel.textContent = `${name} Lv.${lv}`;
+    }
+
+    function updateProgression(prog) {
+      if (!prog) return;
+      lastProgression = prog;
+
+      // XP bar — show skill XP if a skill is active, else pet XP
+      const key = STATE_SKILL_KEY[currentState];
+      let pct;
+      if (key && prog.skills[key]) {
+        const s = prog.skills[key];
+        const needed = Math.floor(100 * s.level * 1.2);
+        pct = Math.min(100, (s.xp / needed) * 100);
+      } else {
+        pct = Math.min(100, (prog.currentLevelXP / prog.nextLevelXP) * 100);
+      }
+      xpFill.style.width = pct + "%";
+
+      // Level badge — show skill level or pet level
+      if (key && prog.skills[key]) {
+        levelBadge.textContent = prog.skills[key].level;
+      } else {
+        levelBadge.textContent = prog.level;
+      }
+      const tier = prog.tierIndex || 0;
+      levelBadge.style.background = TIER_BADGE_COLORS[tier];
+
+      // Color tier on creature
+      if (tier !== currentTier) {
+        scene.classList.remove("tier-" + currentTier);
+        scene.classList.add("tier-" + tier);
+        currentTier = tier;
+      }
+
+      // Milestones
+      updateMilestones(prog.skills, prog.level);
+
+      // Skill label + hover tooltip
+      updateSkillLabel();
+      updateStatsTooltip();
+    }
+
+    function updateMilestones(skills, level) {
+      // Milestones hidden for now
+      return;
+    }
+
+    function renderMilestones() {
+      milestoneLayer.innerHTML = "";
+      for (const m of MILESTONES) {
+        if (unlockedMilestones.has(m.key)) {
+          const div = document.createElement("div");
+          div.innerHTML = m.svg;
+          milestoneLayer.appendChild(div.firstElementChild);
+        }
+      }
+    }
+
+    // ── LEVEL-UP CELEBRATION ─────────────────────────────────────────
+
+    let celebrationTimeout = null;
+
+    const confettiLayer = document.getElementById("confettiLayer");
+    const CONFETTI_COLORS = [
+      "#ffd700", "#ff6b6b", "#48dbfb", "#ff9ff3", "#54a0ff",
+      "#5f27cd", "#01a3a4", "#f368e0", "#ff9f43", "#2ecc71",
+    ];
+    const CONFETTI_SHAPES = ["square", "rect", "circle"];
+
+    function spawnConfetti(count) {
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const el = document.createElement("div");
+          el.className = "confetti";
+          const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+          const shape = CONFETTI_SHAPES[Math.floor(Math.random() * CONFETTI_SHAPES.length)];
+          el.style.left = (Math.random() * 200) + "px";
+          el.style.background = color;
+          if (shape === "rect") {
+            el.style.width = "4px";
+            el.style.height = "8px";
+          } else if (shape === "circle") {
+            el.style.borderRadius = "50%";
+          }
+          const drift = (Math.random() - 0.5) * 60;
+          const dur = 1.5 + Math.random() * 1.5;
+          el.style.animation = `confetti-fall ${dur}s ease-in forwards`;
+          el.style.animationDelay = (Math.random() * 0.4) + "s";
+          el.style.setProperty("--drift", drift + "px");
+          confettiLayer.appendChild(el);
+          setTimeout(() => { if (el.parentNode) el.remove(); }, (dur + 0.5) * 1000);
+        }, i * 30);
+      }
+    }
+
+    function celebrateLevelUp(data) {
+      // 1. Flash status label
+      label.textContent = "LEVEL UP!";
+      label.style.background = "rgba(255,215,0,0.8)";
+      label.style.color = "#2c1810";
+
+      // 2. Body glow pulse
+      creature.classList.add("glow-pulse");
+
+      // 3. XP bar flash
+      xpFill.classList.add("flash");
+
+      // 4. Gold sparkle burst
+      const tierColors = ["#d4a574","#cd7f32","#7ba3bf","#d4a020","#c77f84","#6c5ce7"];
+      const burstColor = tierColors[currentTier] || "#d4a574";
+      for (let i = 0; i < 12; i++) {
+        setTimeout(() => {
+          const el = document.createElement("div");
+          el.className = "p";
+          const shapes = [
+            SVG.sparkle("#ffd700"), SVG.star("#ffd700"), SVG.sparkle(burstColor), SVG.star(burstColor),
+          ];
+          el.innerHTML = shapes[i % shapes.length];
+          el.style.left = (20 + Math.random() * 100) + "px";
+          el.style.top = "40px";
+          el.style.animation = `pop-up ${1 + Math.random() * 0.5}s ease-out forwards`;
+          particleLayer.appendChild(el);
+          setTimeout(() => { if (el.parentNode) el.remove(); }, 2000);
+        }, i * 80);
+      }
+
+      // 5. Confetti burst
+      spawnConfetti(30);
+
+      // 6. Revert after 3 seconds
+      if (celebrationTimeout) clearTimeout(celebrationTimeout);
+      celebrationTimeout = setTimeout(() => {
+        label.style.background = "";
+        label.style.color = "";
+        creature.classList.remove("glow-pulse");
+        xpFill.classList.remove("flash");
+        const cfg = ANIMATIONS[currentState] || ANIMATIONS["idle"];
+        label.textContent = cfg.label || currentState;
+      }, 3000);
+    }
+
     // ── IPC ─────────────────────────────────────────────────────────
 
     ipcRenderer.on("status-change", (e, status) => setState(status));
+
+    ipcRenderer.on("status-update", (e, data) => {
+      if (data.progression) updateProgression(data.progression);
+    });
+
+    ipcRenderer.on("level-up", (e, data) => {
+      celebrateLevelUp(data);
+    });
+
     startIdleCycle();
 
     // ── MOUSE EYE TRACKING ──────────────────────────────────────────
 
     document.addEventListener("mousemove", (e) => {
-      const noTrack = ["thinking", "searching", "reading", "installing", "downloading", "coding", "cooking", "testing", "idle-sleepy", "idle-stargazing"];
+      const noTrack = ["thinking", "searching", "reading", "installing", "downloading", "coding", "cooking", "testing", "idle-sleepy", "idle-stargazing", "idle-butterfly", "idle-meditation", "idle-rainbow", "coding-flow", "coding-hacking", "thinking-eureka", "thinking-galaxy", "thinking-cooking", "thinking-action", "thinking-creating", "thinking-processing", "thinking-growing", "thinking-magical", "thinking-silly", "thinking-exploring", "debugging-detective", "debugging-rage", "searching-treasure", "searching-deep", "reading-scholar", "reading-ancient", "testing-scientist", "testing-perfectionist"];
       if (noTrack.includes(currentState)) return;
 
       const pupils = document.querySelectorAll(".pupil");
