@@ -24,7 +24,11 @@ if (!fs.existsSync(STATUS_FILE)) fs.writeFileSync(STATUS_FILE, "idle");
 
 if (IS_HOOK_MODE) {
   // Reuse classifyTool from hook.js
-  const { classifyTool } = require("./hook.js");
+  // In packaged app, hook.js lives in resources/ (extraResources), not inside the asar
+  const hookModulePath = app.isPackaged
+    ? path.join(process.resourcesPath, "hook.js")
+    : path.join(__dirname, "hook.js");
+  const { classifyTool } = require(hookModulePath);
   const hookEvent = process.argv[process.argv.indexOf("--run-hook") + 1];
 
   // Read stdin synchronously — Electron's async stdin doesn't work with pipes
