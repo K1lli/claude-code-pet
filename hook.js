@@ -31,53 +31,59 @@ function log(msg) {
   } catch (e) {}
 }
 
-const hookEvent = process.argv[2];
-log(`Hook called: ${hookEvent}`);
+// When required by main.js (hook runner mode), only export classifyTool.
+// When run directly (standalone), handle stdin and write status file.
+if (require.main === module) {
+  const hookEvent = process.argv[2];
+  log(`Hook called: ${hookEvent}`);
 
-let input = "";
-process.stdin.setEncoding("utf-8");
-process.stdin.on("data", (chunk) => (input += chunk));
-process.stdin.on("end", () => {
-  let data = {};
-  try {
-    data = JSON.parse(input);
-  } catch (e) {
-    log(`JSON parse error: ${e.message}`);
-  }
-
-  log(`Tool: ${data.tool_name || "N/A"}, Event: ${hookEvent}`);
-  let status = null;
-
-  switch (hookEvent) {
-    case "UserPromptSubmit":
-      status = "thinking";
-      break;
-
-    case "PreToolUse":
-      status = classifyTool(data);
-      break;
-
-    case "PostToolUseFailure":
-      status = "error";
-      break;
-
-    case "Stop":
-      status = "success";
-      break;
-
-    case "Notification":
-      status = "thinking";
-      break;
-  }
-
-  if (status) {
+  let input = "";
+  process.stdin.setEncoding("utf-8");
+  process.stdin.on("data", (chunk) => (input += chunk));
+  process.stdin.on("end", () => {
+    let data = {};
     try {
-      fs.writeFileSync(STATUS_FILE, status);
+      data = JSON.parse(input);
     } catch (e) {
-      // ignore write errors - don't block Claude Code
+      log(`JSON parse error: ${e.message}`);
     }
-  }
-});
+
+    log(`Tool: ${data.tool_name || "N/A"}, Event: ${hookEvent}`);
+    let status = null;
+
+    switch (hookEvent) {
+      case "UserPromptSubmit":
+        status = "thinking";
+        break;
+
+      case "PreToolUse":
+        status = classifyTool(data);
+        break;
+
+      case "PostToolUseFailure":
+        status = "error";
+        break;
+
+      case "Stop":
+        status = "success";
+        break;
+
+      case "Notification":
+        status = "thinking";
+        break;
+    }
+
+    if (status) {
+      try {
+        fs.writeFileSync(STATUS_FILE, status);
+      } catch (e) {
+        // ignore write errors - don't block Claude Code
+      }
+    }
+  });
+}
+
+module.exports = { classifyTool };
 
 // ── Tool Classification ─────────────────────────────────────────────────────
 // Maps Claude Code tool usage to granular pet animation keywords.

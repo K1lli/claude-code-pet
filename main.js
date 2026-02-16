@@ -4,6 +4,11 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 
+// ── Hook Runner Mode ─────────────────────────────────────────────────────────
+// When launched with --run-hook, act as the hook script and exit immediately.
+// This uses Electron's bundled Node.js so users don't need Node.js installed.
+const IS_HOOK_MODE = process.argv.includes("--run-hook");
+
 // Status file that controls the pet's state
 const STATUS_FILE = path.join(
   app.getPath("userData"),
@@ -16,6 +21,33 @@ const PROGRESSION_FILE = path.join(
 
 // Ensure status file exists
 if (!fs.existsSync(STATUS_FILE)) fs.writeFileSync(STATUS_FILE, "idle");
+
+if (IS_HOOK_MODE) {
+  // Reuse classifyTool from hook.js
+  const { classifyTool } = require("./hook.js");
+  const hookEvent = process.argv[process.argv.indexOf("--run-hook") + 1];
+
+  // Read stdin synchronously — Electron's async stdin doesn't work with pipes
+  let input = "";
+  try { input = fs.readFileSync(0, "utf-8"); } catch (e) {}
+
+  let data = {};
+  try { data = JSON.parse(input); } catch (e) {}
+
+  let status = null;
+  switch (hookEvent) {
+    case "UserPromptSubmit": status = "thinking"; break;
+    case "PreToolUse": status = classifyTool(data); break;
+    case "PostToolUseFailure": status = "error"; break;
+    case "Stop": status = "success"; break;
+    case "Notification": status = "thinking"; break;
+  }
+
+  if (status) {
+    try { fs.writeFileSync(STATUS_FILE, status); } catch (e) {}
+  }
+  app.exit(0);
+}
 
 let win, tray;
 let currentStatus = "idle";
@@ -256,8 +288,19 @@ function getNodePath() {
   return nodePath.replace(/\\/g, "/");
 }
 
-function setupHooks() {
+function getHookCommand() {
+  if (app.isPackaged) {
+    // In packaged app, use our own exe as the hook runner (no Node.js needed)
+    const exePath = app.getPath("exe").replace(/\\/g, "/");
+    return `"${exePath}" --run-hook`;
+  }
+  // In dev mode, fall back to system Node.js + hook.js (devs have Node.js)
   const hookPath = getHookPath();
+  const nodePath = getNodePath();
+  return `"${nodePath}" "${hookPath}"`;
+}
+
+function setupHooks() {
   const claudeDir = path.join(os.homedir(), ".claude");
   const settingsPath = path.join(claudeDir, "settings.json");
 
@@ -292,13 +335,13 @@ function setupHooks() {
       (rule) => !JSON.stringify(rule).includes(MARKER)
     );
 
-    // Build our hook entry – use absolute node path so hooks work in VS Code
-    const nodeBin = getNodePath();
+    // Build our hook entry
+    const hookCmd = getHookCommand();
     const entry = {
       hooks: [
         {
           type: "command",
-          command: `"${nodeBin}" "${hookPath}" ${name}`,
+          command: `${hookCmd} ${name}`,
           timeout: 10,
           async: true, // don't block Claude – we just write a file
         },
@@ -530,6 +573,8 @@ function buildTrayMenu(hooksActive) {
 // ── App lifecycle ───────────────────────────────────────────────────────────
 
 app.whenReady().then(() => {
+  if (IS_HOOK_MODE) return; // Hook runner handles everything above
+
   // Load progression data
   progression.load();
 
