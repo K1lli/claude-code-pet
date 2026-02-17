@@ -7,19 +7,72 @@
     background: transparent;
     overflow: hidden;
     width: 200px;
-    height: 220px;
+    height: 300px;
     user-select: none;
     -webkit-app-region: drag;
   }
 
   .scene {
     width: 200px;
-    height: 220px;
+    height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
     position: relative;
+  }
+
+  /* ---- SPEECH BUBBLE ---- */
+  .speech-bubble {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    right: 10px;
+    background: #fff;
+    color: #1a1a2e;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 11px;
+    line-height: 1.3;
+    padding: 8px 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    z-index: 60;
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    max-height: 70px;
+    overflow: hidden;
+  }
+  .speech-bubble.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #fff;
+  }
+  .speech-bubble .bubble-source {
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #6c5ce7;
+    margin-bottom: 2px;
+  }
+  .speech-bubble .bubble-text {
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .status-label {
@@ -128,7 +181,7 @@
   /* ---- HOVER STATS TOOLTIP ---- */
   .stats-tooltip {
     position: absolute;
-    top: 0; left: 0;
+    bottom: 0; left: 0;
     width: 200px;
     height: 220px;
     background: rgba(0,0,0,0.82);
@@ -1489,10 +1542,675 @@
     50% { transform: translateY(10px) translateX(8px); }
     100% { opacity: 0; transform: translateY(-25px) translateX(-5px); }
   }
+
+  /* ================================================================
+     SKIN SYSTEM — LEGO MINIFIG
+     ================================================================ */
+
+  /* Base geometry */
+  .scene.skin-lego .body {
+    background: radial-gradient(circle at 35% 35%, #ffe066, #ffd700);
+    border-radius: 12% 12% 16% 16%;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(0,0,0,0.08), inset 5px 0 8px rgba(0,0,0,0.05), inset -5px 0 8px rgba(0,0,0,0.05);
+  }
+  /* Eyebrows — THE defining LEGO feature */
+  .scene.skin-lego .body::before {
+    content: '';
+    position: absolute;
+    top: 16px; left: 18px;
+    width: 14px; height: 3px;
+    background: #1a1a1a;
+    border-radius: 1px;
+    z-index: 1;
+    transform: rotate(-2deg);
+  }
+  .scene.skin-lego .body::after {
+    content: '';
+    position: absolute;
+    top: 16px; left: 44px;
+    width: 14px; height: 3px;
+    background: #1a1a1a;
+    border-radius: 1px;
+    z-index: 1;
+    transform: rotate(2deg);
+  }
+  .scene.skin-lego .antenna {
+    top: 6px; left: 52px;
+    width: 14px; height: 12px;
+    background: #f5c518;
+    border-radius: 50% 50% 2px 2px;
+    box-shadow: 0 -1px 3px rgba(0,0,0,0.15), inset 0 2px 2px rgba(255,255,255,0.3);
+    animation: none !important;
+  }
+  .scene.skin-lego .antenna::after {
+    display: none;
+    animation: none !important;
+  }
+  .scene.skin-lego .eye {
+    width: 6px; height: 6px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    top: 42px;
+    box-shadow: none;
+  }
+  .scene.skin-lego .eye.left { left: 42px; }
+  .scene.skin-lego .eye.right { left: 68px; }
+  .scene.skin-lego .pupil { display: none; }
+  .scene.skin-lego .mouth {
+    top: 56px; left: 48px;
+    width: 22px; height: 10px;
+    border-bottom: 3px solid #1a1a1a;
+    border-radius: 0 0 50% 50%;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .scene.skin-lego .foot {
+    background: #8b6914;
+    border-radius: 4px 4px 6px 6px;
+    width: 18px; height: 8px;
+  }
+
+  /* LEGO expressions */
+  .skin-lego.expr-neutral .mouth {
+    width: 18px; height: 0;
+    border-bottom: 3px solid #1a1a1a;
+    border-radius: 0;
+    top: 60px; left: 50px;
+  }
+  .skin-lego.expr-happy .mouth {
+    width: 22px; height: 10px;
+    border-bottom: 3px solid #1a1a1a;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 48px;
+  }
+  .skin-lego.expr-focused .eye {
+    width: 6px; height: 4px;
+    border-radius: 50%;
+  }
+  .skin-lego.expr-focused .mouth {
+    width: 14px; height: 0;
+    border-bottom: 2px solid #1a1a1a;
+    border-radius: 0;
+    top: 60px; left: 52px;
+  }
+  .skin-lego.expr-surprised .mouth {
+    width: 10px; height: 10px;
+    border: 2px solid #1a1a1a;
+    border-radius: 50%;
+    background: #1a1a1a;
+    top: 56px; left: 54px;
+  }
+  .skin-lego.expr-surprised .eye {
+    width: 8px; height: 8px;
+  }
+  .skin-lego.expr-angry .mouth {
+    width: 18px; height: 8px;
+    border-top: 3px solid #1a1a1a;
+    border-bottom: none;
+    border-radius: 50% 50% 0 0;
+    top: 60px; left: 50px;
+  }
+  .skin-lego.expr-angry .eye {
+    width: 7px; height: 4px;
+    border-radius: 0 0 50% 50%;
+    top: 43px;
+  }
+  .skin-lego.expr-sleepy .eye {
+    width: 8px; height: 2px;
+    border-radius: 2px;
+    top: 44px;
+  }
+  .skin-lego.expr-sleepy .mouth {
+    width: 14px; height: 0;
+    border-bottom: 2px solid #1a1a1a;
+    border-radius: 0;
+    top: 60px; left: 52px;
+  }
+  .skin-lego.expr-excited .eye {
+    width: 8px; height: 8px;
+  }
+  .skin-lego.expr-excited .mouth {
+    width: 22px; height: 12px;
+    border-bottom: 3px solid #1a1a1a;
+    border-radius: 0 0 50% 50%;
+    top: 55px; left: 48px;
+  }
+  .skin-lego.expr-worried .eye {
+    width: 7px; height: 7px;
+  }
+  .skin-lego.expr-worried .mouth {
+    width: 12px; height: 6px;
+    border-top: 3px solid #1a1a1a;
+    border-bottom: none;
+    border-radius: 50% 50% 0 0;
+    top: 60px; left: 53px;
+  }
+  .skin-lego.expr-smug .eye.left {
+    width: 6px; height: 3px;
+    border-radius: 3px 3px 0 0;
+  }
+  .skin-lego.expr-smug .mouth {
+    width: 16px; height: 6px;
+    border-bottom: 3px solid #1a1a1a;
+    border-radius: 0 0 40% 60%;
+    top: 58px; left: 52px;
+  }
+  .skin-lego.expr-silly .mouth {
+    width: 20px; height: 14px;
+    border: 2px solid #1a1a1a;
+    border-radius: 0 0 50% 50%;
+    background: #1a1a1a;
+    top: 55px; left: 49px;
+  }
+  .skin-lego.expr-silly .mouth::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 6px;
+    background: #ff6b8a;
+    border-radius: 50%;
+    bottom: 0; left: 5px;
+  }
+
+  /* LEGO expression eyebrows */
+  .skin-lego.expr-happy .body::before { top: 14px; transform: rotate(-5deg); }
+  .skin-lego.expr-happy .body::after { top: 14px; transform: rotate(5deg); }
+  .skin-lego.expr-focused .body::before { top: 17px; transform: rotate(4deg); }
+  .skin-lego.expr-focused .body::after { top: 17px; transform: rotate(-4deg); }
+  .skin-lego.expr-surprised .body::before { top: 12px; transform: rotate(0deg); }
+  .skin-lego.expr-surprised .body::after { top: 12px; transform: rotate(0deg); }
+  .skin-lego.expr-angry .body::before { top: 18px; transform: rotate(12deg); }
+  .skin-lego.expr-angry .body::after { top: 18px; transform: rotate(-12deg); }
+  .skin-lego.expr-sleepy .body::before { top: 19px; transform: rotate(0deg); }
+  .skin-lego.expr-sleepy .body::after { top: 19px; transform: rotate(0deg); }
+  .skin-lego.expr-excited .body::before { top: 13px; transform: rotate(-6deg); }
+  .skin-lego.expr-excited .body::after { top: 13px; transform: rotate(6deg); }
+  .skin-lego.expr-worried .body::before { top: 15px; transform: rotate(-8deg); }
+  .skin-lego.expr-worried .body::after { top: 15px; transform: rotate(8deg); }
+  .skin-lego.expr-smug .body::before { top: 13px; transform: rotate(-6deg); }
+  .skin-lego.expr-smug .body::after { top: 17px; transform: rotate(2deg); }
+  .skin-lego.expr-silly .body::before { top: 13px; transform: rotate(-6deg); }
+  .skin-lego.expr-silly .body::after { top: 15px; transform: rotate(-3deg); }
+
+  /* LEGO tier colors (nub changes color) */
+  .skin-lego.tier-0 .body { background: radial-gradient(circle at 35% 35%, #ffe066, #ffd700); }
+  .skin-lego.tier-1 .antenna, .skin-lego.tier-1 .antenna::after { background: #cd7f32; }
+  .skin-lego.tier-2 .antenna, .skin-lego.tier-2 .antenna::after { background: #7ba3bf; }
+  .skin-lego.tier-3 .antenna, .skin-lego.tier-3 .antenna::after { background: #d4a020; }
+  .skin-lego.tier-4 .antenna, .skin-lego.tier-4 .antenna::after { background: #c77f84; }
+  .skin-lego.tier-5 .antenna, .skin-lego.tier-5 .antenna::after { background: #6c5ce7; }
+  .scene.skin-lego .foot { background: #8b6914; }
+
+  /* Disable tier body color changes for LEGO — head stays yellow */
+  .skin-lego.tier-1 .body, .skin-lego.tier-2 .body, .skin-lego.tier-3 .body,
+  .skin-lego.tier-4 .body { background: radial-gradient(circle at 35% 35%, #ffe066, #ffd700); }
+  .skin-lego.tier-5 .body { background: radial-gradient(circle at 35% 35%, #ffe066, #ffd700); animation-name: none; }
+  .skin-lego.tier-1 .foot, .skin-lego.tier-2 .foot, .skin-lego.tier-3 .foot,
+  .skin-lego.tier-4 .foot, .skin-lego.tier-5 .foot { background: #8b6914; }
+
+  /* ================================================================
+     SKIN SYSTEM — BUDDHA
+     ================================================================ */
+
+  /* Base geometry */
+  .scene.skin-buddha .body {
+    background: radial-gradient(circle at 35% 35%, #fae0b8, #f4d6a0);
+    border-radius: 50%;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.2), inset 0 -6px 12px rgba(0,0,0,0.06);
+  }
+  .scene.skin-buddha .body::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 5%;
+    width: 90%; height: 55%;
+    background: linear-gradient(to bottom, #ff8c00, #e07000);
+    border-radius: 0 0 50% 50%;
+    z-index: 0;
+  }
+  .scene.skin-buddha .body::after {
+    content: '';
+    position: absolute;
+    top: 22%; left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 6px;
+    background: radial-gradient(circle, #ffd700, #daa520);
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(255,215,0,0.6);
+    z-index: 3;
+  }
+  .scene.skin-buddha .antenna {
+    top: 2px; left: 49px;
+    width: 18px; height: 16px;
+    background: #3a2a1a;
+    border-radius: 50%;
+    animation: none !important;
+  }
+  .scene.skin-buddha .antenna::after {
+    width: 10px; height: 10px;
+    top: -8px; left: 4px;
+    background: #3a2a1a;
+    border-radius: 50%;
+    box-shadow: none;
+    animation: none !important;
+  }
+  .scene.skin-buddha .eye {
+    width: 14px; height: 6px;
+    background: transparent;
+    border-bottom: 3px solid #3a2a1a;
+    border-radius: 0 0 50% 50%;
+    top: 40px;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .scene.skin-buddha .eye.left { left: 36px; }
+  .scene.skin-buddha .eye.right { left: 66px; }
+  .scene.skin-buddha .pupil { display: none; }
+  .scene.skin-buddha .mouth {
+    top: 56px; left: 50px;
+    width: 18px; height: 8px;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0 0 50% 50%;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .scene.skin-buddha .foot {
+    background: #e07000;
+    border-radius: 4px 4px 50% 50%;
+    width: 24px; height: 8px;
+  }
+  .scene.skin-buddha .foot.left { left: 26px; }
+  .scene.skin-buddha .foot.right { left: 68px; }
+
+  /* Buddha expressions */
+  .skin-buddha.expr-neutral .mouth {
+    width: 18px; height: 8px;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0 0 50% 50%;
+  }
+  .skin-buddha.expr-happy .mouth {
+    width: 20px; height: 10px;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0 0 50% 50%;
+    top: 55px; left: 49px;
+  }
+  .skin-buddha.expr-happy .eye {
+    height: 4px;
+    border-bottom-width: 2px;
+  }
+  .skin-buddha.expr-focused .eye {
+    height: 5px;
+    border-bottom: 2px solid #3a2a1a;
+  }
+  .skin-buddha.expr-focused .mouth {
+    width: 12px; height: 0;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0;
+    top: 59px; left: 53px;
+  }
+  .skin-buddha.expr-surprised .eye {
+    height: 8px;
+    width: 12px;
+    border-bottom: 2px solid #3a2a1a;
+    border-radius: 0 0 50% 50%;
+  }
+  .skin-buddha.expr-surprised .mouth {
+    width: 10px; height: 8px;
+    border: 2px solid #9a7a5a;
+    border-radius: 50%;
+    top: 56px; left: 54px;
+  }
+  .skin-buddha.expr-angry .eye {
+    height: 4px;
+    border-bottom: 3px solid #3a2a1a;
+    transform: rotate(-5deg);
+  }
+  .skin-buddha.expr-angry .eye.right {
+    transform: rotate(5deg);
+  }
+  .skin-buddha.expr-angry .mouth {
+    width: 16px; height: 6px;
+    border-top: 2px solid #9a7a5a;
+    border-bottom: none;
+    border-radius: 50% 50% 0 0;
+    top: 60px; left: 51px;
+  }
+  .skin-buddha.expr-sleepy .eye {
+    height: 2px;
+    border-bottom: 2px solid #3a2a1a;
+    border-radius: 0;
+  }
+  .skin-buddha.expr-sleepy .mouth {
+    width: 14px; height: 0;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0;
+    top: 60px; left: 52px;
+  }
+  .skin-buddha.expr-excited .eye {
+    height: 7px;
+    border-bottom: 3px solid #3a2a1a;
+  }
+  .skin-buddha.expr-excited .mouth {
+    width: 20px; height: 12px;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0 0 50% 50%;
+    top: 54px; left: 49px;
+  }
+  .skin-buddha.expr-worried .eye {
+    border-bottom: 2px solid #3a2a1a;
+    transform: rotate(3deg);
+  }
+  .skin-buddha.expr-worried .eye.right {
+    transform: rotate(-3deg);
+  }
+  .skin-buddha.expr-worried .mouth {
+    width: 10px; height: 0;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0;
+    top: 60px; left: 54px;
+  }
+  .skin-buddha.expr-smug .eye.left {
+    height: 3px;
+  }
+  .skin-buddha.expr-smug .mouth {
+    width: 18px; height: 8px;
+    border-bottom: 2px solid #9a7a5a;
+    border-radius: 0 0 30% 60%;
+    top: 56px; left: 50px;
+  }
+  .skin-buddha.expr-silly .eye {
+    height: 8px;
+    width: 16px;
+    border-bottom: 3px solid #3a2a1a;
+  }
+  .skin-buddha.expr-silly .mouth {
+    width: 16px; height: 10px;
+    border-bottom: 3px solid #9a7a5a;
+    border-radius: 0 0 50% 50%;
+    top: 55px; left: 51px;
+  }
+
+  /* Buddha tier colors (robe changes) */
+  .skin-buddha.tier-0 .body::before { background: linear-gradient(to bottom, #ff8c00, #e07000); }
+  .skin-buddha.tier-0 .foot { background: #e07000; }
+  .skin-buddha.tier-1 .body::before { background: linear-gradient(to bottom, #cd7f32, #a0612a); }
+  .skin-buddha.tier-1 .foot { background: #a0612a; }
+  .skin-buddha.tier-2 .body::before { background: linear-gradient(to bottom, #a8c4d8, #7ba3bf); }
+  .skin-buddha.tier-2 .foot { background: #7ba3bf; }
+  .skin-buddha.tier-3 .body::before { background: linear-gradient(to bottom, #f0d070, #d4a020); }
+  .skin-buddha.tier-3 .foot { background: #d4a020; }
+  .skin-buddha.tier-4 .body::before { background: linear-gradient(to bottom, #e8b4b8, #c77f84); }
+  .skin-buddha.tier-4 .foot { background: #c77f84; }
+  .skin-buddha.tier-5 .body::before { background: linear-gradient(to bottom, #a29bfe, #6c5ce7); }
+  .skin-buddha.tier-5 .foot { background: #6c5ce7; }
+
+  /* Disable default tier body/foot for Buddha */
+  .skin-buddha.tier-1 .body, .skin-buddha.tier-2 .body, .skin-buddha.tier-3 .body,
+  .skin-buddha.tier-4 .body { background: radial-gradient(circle at 35% 35%, #fae0b8, #f4d6a0); }
+  .skin-buddha.tier-5 .body { background: radial-gradient(circle at 35% 35%, #fae0b8, #f4d6a0); animation-name: none; }
+
+  /* ================================================================
+     SKIN SYSTEM — ANIME GIRL
+     ================================================================ */
+
+  /* Base geometry */
+  .scene.skin-anime .body {
+    background: radial-gradient(circle at 35% 35%, #fff0f0, #ffe0e0);
+    border-radius: 50%;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.15), inset 0 -6px 12px rgba(0,0,0,0.05);
+  }
+  .scene.skin-anime .body::before {
+    content: '';
+    position: absolute;
+    top: -12px; left: -6px;
+    width: 92px; height: 55px;
+    background: linear-gradient(135deg, #ff69b4 0%, #ff8ec7 35%, #ff69b4 50%, #ff1493 100%);
+    border-radius: 50% 50% 40% 40%;
+    z-index: 2;
+  }
+  .scene.skin-anime .body::after {
+    content: '';
+    position: absolute;
+    top: 10px; left: -14px;
+    width: 10px; height: 30px;
+    background: linear-gradient(to bottom, #ff69b4, #ff1493);
+    border-radius: 0 0 50% 50%;
+    z-index: 2;
+    box-shadow: 98px 0 0 0 #ff69b4;
+  }
+  .scene.skin-anime .antenna {
+    top: 0px; left: 42px;
+    width: 36px; height: 14px;
+    background: #ff69b4;
+    border-radius: 8px 8px 0 0;
+    z-index: 2;
+    animation: none !important;
+  }
+  .scene.skin-anime .antenna::after {
+    width: 44px; height: 6px;
+    top: 12px; left: -4px;
+    background: #e0508a;
+    border-radius: 0 0 4px 4px;
+    box-shadow: none;
+    animation: none !important;
+  }
+  .scene.skin-anime .eye {
+    width: 18px; height: 20px;
+    background: #fff;
+    border-radius: 40% 40% 50% 50%;
+    top: 36px;
+    box-shadow: inset 0 3px 0 rgba(30,0,30,0.45), inset 0 0 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    z-index: 3;
+  }
+  .scene.skin-anime .eye.left { left: 32px; }
+  .scene.skin-anime .eye.right { left: 64px; }
+  .scene.skin-anime .pupil {
+    display: block;
+    width: 12px; height: 14px;
+    background: radial-gradient(circle at 40% 35%, #c77dff, #9b59b6);
+    border-radius: 50%;
+    top: 3px; left: 3px;
+  }
+  .scene.skin-anime .pupil::after {
+    width: 4px; height: 4px;
+    top: 2px; left: 2px;
+    background: #fff;
+    box-shadow: 4px 6px 0 1px rgba(255,255,255,0.5);
+  }
+  /* Blush cheeks via eye pseudo-elements */
+  .scene.skin-anime .eye.left::after,
+  .scene.skin-anime .eye.right::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    width: 14px; height: 8px;
+    background: rgba(255,150,150,0.45);
+    border-radius: 50%;
+    filter: blur(2px);
+    z-index: 4;
+  }
+  .scene.skin-anime .eye.left::after { left: -2px; }
+  .scene.skin-anime .eye.right::after { right: -2px; left: auto; }
+  .scene.skin-anime .mouth {
+    top: 58px; left: 52px;
+    width: 12px; height: 6px;
+    border-bottom: 2px solid #e06080;
+    border-radius: 0 0 50% 50%;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    z-index: 3;
+  }
+  .scene.skin-anime .foot {
+    background: #ff69b4;
+    border-radius: 50% 50% 50% 50%;
+    width: 16px; height: 10px;
+  }
+
+  /* Anime expressions */
+  .skin-anime.expr-neutral .mouth {
+    width: 12px; height: 6px;
+    border-bottom: 2px solid #e06080;
+    border-radius: 0 0 50% 50%;
+  }
+  .skin-anime.expr-happy .eye {
+    height: 10px;
+    border-radius: 50% 50% 0 0;
+    background: transparent;
+    border-top: 3px solid #9b59b6;
+    overflow: visible;
+  }
+  .skin-anime.expr-happy .pupil { display: none; }
+  .skin-anime.expr-happy .mouth {
+    width: 16px; height: 8px;
+    border-bottom: 2px solid #e06080;
+    border-radius: 0 0 50% 50%;
+    top: 56px; left: 51px;
+  }
+  .skin-anime.expr-focused .pupil {
+    width: 10px; height: 12px;
+  }
+  .skin-anime.expr-focused .mouth {
+    width: 8px; height: 0;
+    border-bottom: 2px solid #e06080;
+    border-radius: 0;
+    top: 60px; left: 55px;
+  }
+  .skin-anime.expr-surprised .eye {
+    width: 20px; height: 22px;
+  }
+  .skin-anime.expr-surprised .pupil {
+    width: 8px; height: 10px;
+    top: 6px; left: 6px;
+  }
+  .skin-anime.expr-surprised .mouth {
+    width: 10px; height: 10px;
+    border: 2px solid #e06080;
+    border-radius: 50%;
+    top: 56px; left: 54px;
+  }
+  .skin-anime.expr-angry .eye {
+    clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 100%);
+  }
+  .skin-anime.expr-angry .pupil {
+    background: radial-gradient(circle at 40% 35%, #ff6b6b, #c0392b);
+  }
+  .skin-anime.expr-angry .mouth {
+    width: 14px; height: 6px;
+    border-top: 3px solid #e06080;
+    border-bottom: none;
+    border-radius: 50% 50% 0 0;
+    top: 60px; left: 52px;
+  }
+  .skin-anime.expr-sleepy .eye {
+    height: 6px;
+    overflow: hidden;
+  }
+  .skin-anime.expr-sleepy .pupil {
+    top: -4px;
+  }
+  .skin-anime.expr-sleepy .mouth {
+    width: 10px; height: 0;
+    border-bottom: 2px solid #e06080;
+    border-radius: 0;
+    top: 60px; left: 54px;
+  }
+  .skin-anime.expr-excited .eye {
+    width: 20px; height: 22px;
+  }
+  .skin-anime.expr-excited .pupil {
+    width: 14px; height: 16px;
+    background: radial-gradient(circle at 40% 30%, #ff9ff3, #9b59b6);
+  }
+  .skin-anime.expr-excited .mouth {
+    width: 18px; height: 10px;
+    border-bottom: 2px solid #e06080;
+    border-radius: 0 0 50% 50%;
+    top: 55px; left: 50px;
+  }
+  .skin-anime.expr-worried .eye {
+    transform: rotate(3deg);
+  }
+  .skin-anime.expr-worried .eye.right {
+    transform: rotate(-3deg);
+  }
+  .skin-anime.expr-worried .pupil {
+    background: radial-gradient(circle at 40% 35%, #dda0dd, #9b59b6);
+    top: 5px;
+  }
+  .skin-anime.expr-worried .mouth {
+    width: 8px; height: 4px;
+    border-top: 2px solid #e06080;
+    border-bottom: none;
+    border-radius: 40% 40% 0 0;
+    top: 60px; left: 55px;
+  }
+  .skin-anime.expr-smug .eye.left {
+    height: 8px;
+    overflow: hidden;
+  }
+  .skin-anime.expr-smug .eye.left .pupil {
+    top: -2px;
+  }
+  .skin-anime.expr-smug .mouth {
+    width: 14px; height: 6px;
+    border-bottom: 2px solid #e06080;
+    border-radius: 0 0 30% 60%;
+    top: 58px; left: 52px;
+  }
+  .skin-anime.expr-silly .eye {
+    width: 20px; height: 20px;
+  }
+  .skin-anime.expr-silly .pupil {
+    width: 14px; height: 14px;
+    background: radial-gradient(circle at 50% 50%, #ff9ff3, #c77dff, #9b59b6);
+  }
+  .skin-anime.expr-silly .mouth {
+    width: 16px; height: 10px;
+    border: 2px solid #e06080;
+    border-radius: 0 0 50% 50%;
+    border-top: none;
+    top: 56px; left: 51px;
+  }
+  .skin-anime.expr-silly .mouth::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 5px;
+    background: #ff6b8a;
+    border-radius: 50%;
+    bottom: 0; left: 3px;
+  }
+
+  /* Anime tier colors (hair changes) */
+  .skin-anime.tier-0 .body::before { background: linear-gradient(135deg, #ff69b4 0%, #ff8ec7 35%, #ff69b4 50%, #ff1493 100%); }
+  .skin-anime.tier-0 .body::after { background: linear-gradient(to bottom, #ff69b4, #ff1493); box-shadow: 98px 0 0 0 #ff69b4; }
+  .skin-anime.tier-1 .body::before { background: linear-gradient(135deg, #cd7f32, #a0612a); }
+  .skin-anime.tier-1 .body::after { background: linear-gradient(to bottom, #cd7f32, #a0612a); box-shadow: 98px 0 0 0 #cd7f32; }
+  .skin-anime.tier-2 .body::before { background: linear-gradient(135deg, #5dade2, #3498db); }
+  .skin-anime.tier-2 .body::after { background: linear-gradient(to bottom, #5dade2, #3498db); box-shadow: 98px 0 0 0 #5dade2; }
+  .skin-anime.tier-3 .body::before { background: linear-gradient(135deg, #f0d070, #d4a020); }
+  .skin-anime.tier-3 .body::after { background: linear-gradient(to bottom, #f0d070, #d4a020); box-shadow: 98px 0 0 0 #f0d070; }
+  .skin-anime.tier-4 .body::before { background: linear-gradient(135deg, #e8b4b8, #c77f84); }
+  .skin-anime.tier-4 .body::after { background: linear-gradient(to bottom, #e8b4b8, #c77f84); box-shadow: 98px 0 0 0 #e8b4b8; }
+  .skin-anime.tier-5 .body::before { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
+  .skin-anime.tier-5 .body::after { background: linear-gradient(to bottom, #a29bfe, #6c5ce7); box-shadow: 98px 0 0 0 #a29bfe; }
+
+  /* Disable default tier body/foot for Anime */
+  .skin-anime.tier-1 .body, .skin-anime.tier-2 .body, .skin-anime.tier-3 .body,
+  .skin-anime.tier-4 .body { background: radial-gradient(circle at 35% 35%, #fff0f0, #ffe0e0); }
+  .skin-anime.tier-5 .body { background: radial-gradient(circle at 35% 35%, #fff0f0, #ffe0e0); animation-name: none; }
+  .skin-anime.tier-1 .foot, .skin-anime.tier-2 .foot, .skin-anime.tier-3 .foot,
+  .skin-anime.tier-4 .foot, .skin-anime.tier-5 .foot { background: #ff69b4; }
+
 </style>
 </head>
 <body>
   <div class="scene" id="scene">
+    <div class="speech-bubble" id="speechBubble">
+      <div class="bubble-source" id="bubbleSource"></div>
+      <div class="bubble-text" id="bubbleText"></div>
+    </div>
     <div class="status-label" id="statusLabel">idle</div>
     <div class="creature" id="creature">
       <div class="antenna"></div>
@@ -1531,6 +2249,51 @@
     let currentTier = 0;
     let unlockedMilestones = new Set();
     let lastProgression = null;
+    let currentSkin = "default";
+
+    // Expression abstraction layer: 43 states → 10 expression categories
+    const EXPRESSION_MAP = {
+      idle: "neutral", "idle-coffee": "neutral", "idle-stargazing": "neutral",
+      "idle-butterfly": "neutral", reading: "neutral", "reading-scholar": "neutral",
+      installing: "neutral", downloading: "neutral", cooking: "neutral",
+      success: "happy", "idle-vibing": "happy", "idle-stretching": "happy",
+      "coding-flow": "happy", "thinking-growing": "happy", "testing-perfectionist": "happy",
+      thinking: "focused", coding: "focused",
+      "thinking-cooking": "focused", "thinking-creating": "focused",
+      "thinking-processing": "focused", "thinking-action": "focused",
+      "coding-hacking": "focused", "debugging-detective": "focused",
+      testing: "focused", "testing-scientist": "focused",
+      "thinking-eureka": "surprised", deploying: "surprised",
+      "deploying-warp": "surprised", "deploying-satellite": "surprised",
+      "searching-deep": "surprised",
+      error: "angry", "debugging-rage": "angry", deleting: "angry",
+      "idle-sleepy": "sleepy", "idle-meditation": "sleepy", "reading-ancient": "sleepy",
+      "idle-dancing": "excited", "idle-rainbow": "excited", "idle-juggling": "excited",
+      "thinking-silly": "excited", "searching-treasure": "excited",
+      debugging: "worried", hatching: "worried", "thinking-exploring": "worried",
+      "thinking-galaxy": "smug", "thinking-magical": "smug",
+      searching: "silly",
+    };
+
+    function getExpressionClass(state) {
+      const expr = EXPRESSION_MAP[state] || "neutral";
+      return "expr-" + expr;
+    }
+
+    function getSkinClass() {
+      return currentSkin === "default" ? "" : "skin-" + currentSkin;
+    }
+
+    function buildSceneClassName(stateStr) {
+      let cn = "scene state-" + stateStr + " tier-" + currentTier;
+      const skinCls = getSkinClass();
+      if (skinCls) cn += " " + skinCls;
+      cn += " " + getExpressionClass(stateStr);
+      if (currentSkin !== "default") {
+        console.log("[Skin] buildClassName:", cn, "| state:", stateStr, "| expr:", EXPRESSION_MAP[stateStr] || "neutral");
+      }
+      return cn;
+    }
 
     // Map state → display name for the skill label
     const STATE_SKILL_NAME = {
@@ -2682,7 +3445,7 @@
         ipcRenderer.send("idle-variant-change", "idle");
       }
 
-      scene.className = "scene state-" + variant + " tier-" + currentTier;
+      scene.className = buildSceneClassName(variant);
       label.textContent = config.label;
       currentState = variant;
       updateAccessories(config);
@@ -2755,7 +3518,7 @@
 
       ipcRenderer.send("activity-variant-change", currentActivityVariant);
 
-      scene.className = "scene state-" + effectiveState + " tier-" + currentTier;
+      scene.className = buildSceneClassName(effectiveState);
       label.textContent = config.label || effectiveState;
       currentState = effectiveState;
 
@@ -2952,11 +3715,10 @@
       const tier = prog.tierIndex || 0;
       levelBadge.style.background = TIER_BADGE_COLORS[tier];
 
-      // Color tier on creature
+      // Color tier on creature — rebuild full className to keep skin/expr in sync
       if (tier !== currentTier) {
-        scene.classList.remove("tier-" + currentTier);
-        scene.classList.add("tier-" + tier);
         currentTier = tier;
+        scene.className = buildSceneClassName(currentState);
       }
 
       // Milestones
@@ -3076,6 +3838,29 @@
 
     ipcRenderer.on("level-up", (e, data) => {
       celebrateLevelUp(data);
+    });
+
+    // ── Speech Bubble ──────────────────────────────────────────────
+    const speechBubble = document.getElementById("speechBubble");
+    const bubbleSource = document.getElementById("bubbleSource");
+    const bubbleText = document.getElementById("bubbleText");
+
+    ipcRenderer.on("show-message", (e, data) => {
+      bubbleSource.textContent = data.source || "";
+      bubbleText.textContent = data.text || "";
+      speechBubble.classList.add("visible");
+    });
+
+    ipcRenderer.on("hide-message", () => {
+      speechBubble.classList.remove("visible");
+    });
+
+    ipcRenderer.on("skin-change", (e, skin) => {
+      console.log("[Skin] Renderer received skin-change:", skin);
+      currentSkin = skin || "default";
+      const newClass = buildSceneClassName(currentState);
+      console.log("[Skin] scene.className →", newClass);
+      scene.className = newClass;
     });
 
     startIdleCycle();
