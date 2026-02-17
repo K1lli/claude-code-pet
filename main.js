@@ -58,6 +58,58 @@ let currentStatus = "idle";
 let lastChangeTime = Date.now();
 let currentIdleVariant = "idle";
 let currentActivityVariant = null;
+let watcherManager = null;
+let petConfig = null;
+let bubbleExpanded = false;
+
+// ── Message Queue ────────────────────────────────────────────────────────────
+
+const messageQueue = [];
+let messageProcessing = false;
+const MAX_QUEUE = 5;
+
+function enqueueMessage(msg) {
+  if (messageQueue.length >= MAX_QUEUE) messageQueue.shift();
+  messageQueue.push(msg);
+  if (!messageProcessing) processMessageQueue();
+}
+
+function processMessageQueue() {
+  if (messageQueue.length === 0) {
+    messageProcessing = false;
+    return;
+  }
+  messageProcessing = true;
+  const msg = messageQueue.shift();
+  showMessage(msg.text, msg.source, msg.duration || 8000);
+  setTimeout(processMessageQueue, 500);
+}
+
+function showMessage(text, source, duration) {
+  if (!win) return;
+  // Expand window upward for speech bubble
+  if (!bubbleExpanded) {
+    const bounds = win.getBounds();
+    win.setBounds({ x: bounds.x, y: bounds.y - 80, width: 200, height: 300 });
+    bubbleExpanded = true;
+  }
+  win.webContents.send("show-message", { text, source, duration });
+  setTimeout(() => hideMessage(), duration);
+}
+
+function hideMessage() {
+  if (!win) return;
+  win.webContents.send("hide-message");
+  // Shrink window back after animation
+  setTimeout(() => {
+    if (!win || messageQueue.length > 0) return;
+    if (bubbleExpanded) {
+      const bounds = win.getBounds();
+      win.setBounds({ x: bounds.x, y: bounds.y + 80, width: 200, height: 220 });
+      bubbleExpanded = false;
+    }
+  }, 400);
+}
 
 // ── Progression System ──────────────────────────────────────────────────────
 
@@ -76,6 +128,7 @@ const XP_RATES = {
   "testing-scientist": 3, "testing-perfectionist": 3,
   "deploying-warp": 3, "deploying-satellite": 3,
   idle: 0, success: 0, error: 0, hatching: 0, deleting: 0,
+  "idle-coffee": 0,
 };
 
 const SKILL_ACTIVITIES = {
@@ -385,6 +438,134 @@ function removeHooks() {
   fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
 }
 
+// ── Watchers ─────────────────────────────────────────────────────────────────
+
+function initWatchers() {
+  const config = require("./config");
+  petConfig = config;
+  config.load();
+  const cfg = config.get();
+
+  const { WatcherManager, PRIORITY } = require("./watchers/manager");
+  const { IdleDetector } = require("./watchers/idle-detector");
+  const { WindowTracker } = require("./watchers/window-tracker");
+  const { SystemMonitor } = require("./watchers/system-monitor");
+  const { PomodoroTimer } = require("./watchers/pomodoro");
+  const { GitWatcher } = require("./watchers/git-watcher");
+  const { BuildWatcher } = require("./watchers/build-watcher");
+  const { SlackWatcher } = require("./watchers/slack");
+
+  watcherManager = new WatcherManager({
+    statusFile: STATUS_FILE,
+    config: cfg,
+    onStatusChange: (status, source) => {
+      // Only change status if hook is not active
+      if (!watcherManager.isHookActive()) {
+        writeStatus(status);
+      }
+    },
+    onMessage: (msg) => {
+      enqueueMessage(msg);
+    },
+  });
+
+  // Register watchers with their priorities
+  const w = cfg.watchers;
+
+  if (w.idleDetector.enabled) {
+    watcherManager.register("idle", new IdleDetector(w.idleDetector), PRIORITY.IDLE);
+  }
+  if (w.windowTracker.enabled) {
+    watcherManager.register("window", new WindowTracker(w.windowTracker), PRIORITY.WINDOW);
+  }
+  if (w.systemMonitor.enabled) {
+    watcherManager.register("system", new SystemMonitor(w.systemMonitor), PRIORITY.SYSTEM);
+  }
+  if (w.pomodoro.enabled) {
+    watcherManager.register("pomodoro", new PomodoroTimer(w.pomodoro), PRIORITY.POMODORO);
+  }
+  if (w.gitWatcher.enabled) {
+    watcherManager.register("git", new GitWatcher(w.gitWatcher), PRIORITY.GIT);
+  }
+  if (w.buildWatcher.enabled) {
+    watcherManager.register("build", new BuildWatcher(w.buildWatcher), PRIORITY.BUILD);
+  }
+  if (w.slack.enabled) {
+    watcherManager.register("slack", new SlackWatcher(w.slack), PRIORITY.GIT); // same as git priority
+  }
+
+  watcherManager.start();
+}
+
+function restartWatcherByName(name, enabled) {
+  if (!petConfig) return;
+  const cfg = petConfig.get();
+  const { PRIORITY } = require("./watchers/manager");
+
+  // Stop and remove existing
+  const existing = watcherManager.getWatcher(name);
+  if (existing) {
+    existing.stop();
+    watcherManager.watchers.delete(name);
+  }
+
+  if (!enabled) return;
+
+  // Create and register new instance
+  const w = cfg.watchers;
+  let watcher, priority;
+
+  switch (name) {
+    case "idle": {
+      const { IdleDetector } = require("./watchers/idle-detector");
+      watcher = new IdleDetector(w.idleDetector);
+      priority = PRIORITY.IDLE;
+      break;
+    }
+    case "window": {
+      const { WindowTracker } = require("./watchers/window-tracker");
+      watcher = new WindowTracker(w.windowTracker);
+      priority = PRIORITY.WINDOW;
+      break;
+    }
+    case "system": {
+      const { SystemMonitor } = require("./watchers/system-monitor");
+      watcher = new SystemMonitor(w.systemMonitor);
+      priority = PRIORITY.SYSTEM;
+      break;
+    }
+    case "pomodoro": {
+      const { PomodoroTimer } = require("./watchers/pomodoro");
+      watcher = new PomodoroTimer(w.pomodoro);
+      priority = PRIORITY.POMODORO;
+      break;
+    }
+    case "git": {
+      const { GitWatcher } = require("./watchers/git-watcher");
+      watcher = new GitWatcher(w.gitWatcher);
+      priority = PRIORITY.GIT;
+      break;
+    }
+    case "build": {
+      const { BuildWatcher } = require("./watchers/build-watcher");
+      watcher = new BuildWatcher(w.buildWatcher);
+      priority = PRIORITY.BUILD;
+      break;
+    }
+    case "slack": {
+      const { SlackWatcher } = require("./watchers/slack");
+      watcher = new SlackWatcher(w.slack);
+      priority = PRIORITY.GIT;
+      break;
+    }
+  }
+
+  if (watcher) {
+    watcherManager.register(name, watcher, priority);
+    watcher.start();
+  }
+}
+
 // ── Window ──────────────────────────────────────────────────────────────────
 
 function createWindow() {
@@ -458,6 +639,8 @@ function createWindow() {
       const elapsed = Date.now() - lastChangeTime;
 
       // Auto-revert transient states → idle after timeout
+      // But only if watchers aren't actively controlling status
+      const watcherActive = watcherManager && !watcherManager.isHookActive() && watcherManager.currentSource;
       const quickRevert = ["success", "error"];
       const slowRevert = [
         "thinking", "coding", "searching", "reading", "debugging",
@@ -465,10 +648,17 @@ function createWindow() {
         "deleting", "downloading",
       ];
 
-      if (quickRevert.includes(currentStatus) && elapsed > 5000) {
-        writeStatus("idle");
-      } else if (slowRevert.includes(currentStatus) && elapsed > 120_000) {
-        writeStatus("idle");
+      if (!watcherActive) {
+        if (quickRevert.includes(currentStatus) && elapsed > 5000) {
+          writeStatus("idle");
+        } else if (slowRevert.includes(currentStatus) && elapsed > 120_000) {
+          writeStatus("idle");
+        }
+      } else {
+        // Still revert quick states even with watchers
+        if (quickRevert.includes(currentStatus) && elapsed > 5000) {
+          writeStatus("idle");
+        }
       }
     } catch (e) {
       // ignore
@@ -508,8 +698,230 @@ function buildStatsSubmenu() {
   ];
 }
 
+function buildWatchersSubmenu() {
+  if (!petConfig) return [];
+  const cfg = petConfig.get();
+  const w = cfg.watchers;
+
+  const items = [
+    {
+      label: "Idle Detection",
+      type: "checkbox",
+      checked: w.idleDetector.enabled,
+      click: (mi) => {
+        petConfig.set("watchers.idleDetector.enabled", mi.checked);
+        restartWatcherByName("idle", mi.checked);
+      },
+    },
+    {
+      label: "Window Tracking",
+      type: "checkbox",
+      checked: w.windowTracker.enabled,
+      click: (mi) => {
+        petConfig.set("watchers.windowTracker.enabled", mi.checked);
+        restartWatcherByName("window", mi.checked);
+      },
+    },
+    {
+      label: "CPU/RAM Monitor",
+      type: "checkbox",
+      checked: w.systemMonitor.enabled,
+      click: (mi) => {
+        petConfig.set("watchers.systemMonitor.enabled", mi.checked);
+        restartWatcherByName("system", mi.checked);
+      },
+    },
+    {
+      label: "Pomodoro Timer",
+      type: "checkbox",
+      checked: w.pomodoro.enabled,
+      click: (mi) => {
+        petConfig.set("watchers.pomodoro.enabled", mi.checked);
+        restartWatcherByName("pomodoro", mi.checked);
+        refreshTray();
+      },
+    },
+    {
+      label: "Git Watcher",
+      type: "checkbox",
+      checked: w.gitWatcher.enabled,
+      click: (mi) => {
+        petConfig.set("watchers.gitWatcher.enabled", mi.checked);
+        restartWatcherByName("git", mi.checked);
+        refreshTray();
+      },
+    },
+    {
+      label: "Build Watcher",
+      type: "checkbox",
+      checked: w.buildWatcher.enabled,
+      click: (mi) => {
+        petConfig.set("watchers.buildWatcher.enabled", mi.checked);
+        restartWatcherByName("build", mi.checked);
+        refreshTray();
+      },
+    },
+    {
+      label: "Slack",
+      type: "checkbox",
+      checked: w.slack.enabled,
+      click: (mi) => {
+        petConfig.set("watchers.slack.enabled", mi.checked);
+        restartWatcherByName("slack", mi.checked);
+        refreshTray();
+      },
+    },
+  ];
+
+  // System monitor stats line
+  const sysMon = watcherManager && watcherManager.getWatcher("system");
+  if (sysMon) {
+    items.push({ type: "separator" });
+    items.push({
+      label: `CPU: ${sysMon.getCpuPercent()}% | RAM: ${sysMon.getRamPercent()}%`,
+      enabled: false,
+    });
+  }
+
+  return items;
+}
+
+function buildPomodoroSubmenu() {
+  const pomo = watcherManager && watcherManager.getWatcher("pomodoro");
+  if (!pomo) return [];
+
+  const items = [];
+  if (pomo.isActive()) {
+    const phase = pomo.getPhase();
+    items.push({
+      label: `${phase === "work" ? "Work" : "Break"}: ${pomo.formatTime()}`,
+      enabled: false,
+    });
+    items.push({
+      label: "Stop",
+      click: () => { pomo.reset(); refreshTray(); },
+    });
+  } else {
+    items.push({
+      label: "Start Work",
+      click: () => { pomo.startWork(); refreshTray(); },
+    });
+  }
+  items.push({
+    label: "Reset",
+    click: () => { pomo.reset(); refreshTray(); },
+  });
+
+  return items;
+}
+
+function buildGitSubmenu() {
+  const git = watcherManager && watcherManager.getWatcher("git");
+  if (!git) return [];
+
+  const items = [
+    {
+      label: "Select Repository...",
+      click: () => {
+        dialog.showOpenDialog({ properties: ["openDirectory"] }).then((result) => {
+          if (!result.canceled && result.filePaths.length > 0) {
+            const repoPath = result.filePaths[0];
+            petConfig.set("watchers.gitWatcher.repoPath", repoPath);
+            git.setRepoPath(repoPath);
+            refreshTray();
+          }
+        });
+      },
+    },
+  ];
+
+  if (git.repoPath) {
+    items.push({
+      label: `Repo: ${path.basename(git.repoPath)}`,
+      enabled: false,
+    });
+  }
+
+  return items;
+}
+
+function buildBuildSubmenu() {
+  const build = watcherManager && watcherManager.getWatcher("build");
+  if (!build) return [];
+
+  const items = [
+    {
+      label: "Select Folder...",
+      click: () => {
+        dialog.showOpenDialog({ properties: ["openDirectory"] }).then((result) => {
+          if (!result.canceled && result.filePaths.length > 0) {
+            const watchPath = result.filePaths[0];
+            petConfig.set("watchers.buildWatcher.watchPath", watchPath);
+            build.setWatchPath(watchPath);
+            refreshTray();
+          }
+        });
+      },
+    },
+  ];
+
+  if (build.watchPath) {
+    items.push({
+      label: `Watching: ${path.basename(build.watchPath)}`,
+      enabled: false,
+    });
+  }
+
+  return items;
+}
+
+function buildSlackSubmenu() {
+  const slack = watcherManager && watcherManager.getWatcher("slack");
+  if (!slack) return [];
+
+  const items = [
+    {
+      label: "Set Token...",
+      click: () => {
+        // Simple dialog for token input
+        const tokenWin = new BrowserWindow({
+          width: 420, height: 180,
+          resizable: false,
+          frame: true,
+          alwaysOnTop: true,
+          webPreferences: { nodeIntegration: true, contextIsolation: false },
+        });
+        tokenWin.setMenuBarVisibility(false);
+        const html = `<!DOCTYPE html><html><body style="font-family:Segoe UI;padding:16px;background:#1e1e2e;color:#cdd6f4">
+          <p style="margin:0 0 8px">Slack Bot Token (xoxb-...):</p>
+          <input id="t" type="text" style="width:100%;padding:6px;background:#313244;color:#cdd6f4;border:1px solid #585b70;border-radius:4px" placeholder="xoxb-your-token-here" value="${slack.token || ""}">
+          <div style="margin-top:12px;text-align:right">
+            <button onclick="save()" style="padding:6px 16px;background:#89b4fa;color:#1e1e2e;border:none;border-radius:4px;cursor:pointer">Save</button>
+            <button onclick="window.close()" style="padding:6px 16px;background:#585b70;color:#cdd6f4;border:none;border-radius:4px;cursor:pointer;margin-left:8px">Cancel</button>
+          </div>
+          <script>const{ipcRenderer}=require("electron");function save(){ipcRenderer.send("slack-token-set",document.getElementById("t").value);window.close()}</script>
+        </body></html>`;
+        tokenWin.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+      },
+    },
+    {
+      label: slack.isConnected() ? "Status: Connected" : "Status: Disconnected",
+      enabled: false,
+    },
+    {
+      label: "Show Messages",
+      type: "checkbox",
+      checked: slack.showMessages,
+      click: (mi) => { slack.showMessages = mi.checked; },
+    },
+  ];
+
+  return items;
+}
+
 function buildTrayMenu(hooksActive) {
-  return Menu.buildFromTemplate([
+  const cfg = petConfig ? petConfig.get() : null;
+  const template = [
     {
       label: hooksActive ? "Auto-detect Active" : "Auto-detect Off",
       enabled: false,
@@ -519,7 +931,8 @@ function buildTrayMenu(hooksActive) {
       click: () => {
         try {
           setupHooks();
-          tray.setContextMenu(buildTrayMenu(true));
+          hooksActiveGlobal = true;
+          refreshTray();
           dialog.showMessageBox({
             message:
               "Hooks installed successfully!\nRestart any running Claude Code sessions for changes to take effect.",
@@ -536,7 +949,8 @@ function buildTrayMenu(hooksActive) {
       click: () => {
         try {
           removeHooks();
-          tray.setContextMenu(buildTrayMenu(false));
+          hooksActiveGlobal = false;
+          refreshTray();
         } catch (e) {
           // ignore
         }
@@ -544,34 +958,118 @@ function buildTrayMenu(hooksActive) {
     },
     { type: "separator" },
     {
-      label: "Stats",
-      submenu: buildStatsSubmenu(),
+      label: "Watchers",
+      submenu: buildWatchersSubmenu(),
     },
-    { type: "separator" },
     {
-      label: "Manual",
-      submenu: [
-        { label: "Idle", click: () => writeStatus("idle") },
-        { label: "Thinking", click: () => writeStatus("thinking") },
-        { label: "Coding", click: () => writeStatus("coding") },
-        { label: "Success", click: () => writeStatus("success") },
-        { label: "Error", click: () => writeStatus("error") },
-        { type: "separator" },
-        { label: "Searching", click: () => writeStatus("searching") },
-        { label: "Reading", click: () => writeStatus("reading") },
-        { label: "Debugging", click: () => writeStatus("debugging") },
-        { label: "Installing", click: () => writeStatus("installing") },
-        { label: "Testing", click: () => writeStatus("testing") },
-        { label: "Deploying", click: () => writeStatus("deploying") },
-        { label: "Cooking", click: () => writeStatus("cooking") },
-        { label: "Hatching", click: () => writeStatus("hatching") },
-        { label: "Deleting", click: () => writeStatus("deleting") },
-        { label: "Downloading", click: () => writeStatus("downloading") },
-      ],
+      label: "Skin",
+      submenu: buildSkinSubmenu(),
     },
-    { type: "separator" },
-    { label: "Quit", click: () => app.quit() },
-  ]);
+  ];
+
+  // Pomodoro submenu (only if enabled)
+  if (cfg && cfg.watchers.pomodoro.enabled) {
+    template.push({
+      label: "Pomodoro",
+      submenu: buildPomodoroSubmenu(),
+    });
+  }
+
+  // Git submenu (only if enabled)
+  if (cfg && cfg.watchers.gitWatcher.enabled) {
+    template.push({
+      label: "Git",
+      submenu: buildGitSubmenu(),
+    });
+  }
+
+  // Build submenu (only if enabled)
+  if (cfg && cfg.watchers.buildWatcher.enabled) {
+    template.push({
+      label: "Build",
+      submenu: buildBuildSubmenu(),
+    });
+  }
+
+  // Slack submenu (only if enabled)
+  if (cfg && cfg.watchers.slack.enabled) {
+    template.push({
+      label: "Slack",
+      submenu: buildSlackSubmenu(),
+    });
+  }
+
+  template.push({ type: "separator" });
+  template.push({
+    label: "Stats",
+    submenu: buildStatsSubmenu(),
+  });
+  template.push({ type: "separator" });
+  template.push({
+    label: "Manual",
+    submenu: [
+      { label: "Idle", click: () => writeStatus("idle") },
+      { label: "Thinking", click: () => writeStatus("thinking") },
+      { label: "Coding", click: () => writeStatus("coding") },
+      { label: "Success", click: () => writeStatus("success") },
+      { label: "Error", click: () => writeStatus("error") },
+      { type: "separator" },
+      { label: "Searching", click: () => writeStatus("searching") },
+      { label: "Reading", click: () => writeStatus("reading") },
+      { label: "Debugging", click: () => writeStatus("debugging") },
+      { label: "Installing", click: () => writeStatus("installing") },
+      { label: "Testing", click: () => writeStatus("testing") },
+      { label: "Deploying", click: () => writeStatus("deploying") },
+      { label: "Cooking", click: () => writeStatus("cooking") },
+      { label: "Hatching", click: () => writeStatus("hatching") },
+      { label: "Deleting", click: () => writeStatus("deleting") },
+      { label: "Downloading", click: () => writeStatus("downloading") },
+    ],
+  });
+  template.push({ type: "separator" });
+  template.push({ label: "Quit", click: () => app.quit() });
+
+  return Menu.buildFromTemplate(template);
+}
+
+let hooksActiveGlobal = false;
+let currentSkinGlobal = "default";
+
+function setSkin(skin) {
+  console.log("[Skin] setSkin called:", skin);
+  currentSkinGlobal = skin;
+  if (petConfig) {
+    petConfig.set("skin", skin);
+    console.log("[Skin] Saved to config");
+  }
+  if (win) {
+    win.webContents.send("skin-change", skin);
+    console.log("[Skin] Sent skin-change IPC to renderer");
+  }
+}
+
+function buildSkinSubmenu() {
+  const skins = [
+    { id: "default", label: "Default Blob" },
+    { id: "lego", label: "LEGO Minifig" },
+    { id: "buddha", label: "Buddha" },
+    { id: "anime", label: "Anime Girl" },
+  ];
+  return skins.map(s => ({
+    label: s.label,
+    type: "radio",
+    checked: currentSkinGlobal === s.id,
+    click: () => {
+      setSkin(s.id);
+      refreshTray();
+    },
+  }));
+}
+
+function refreshTray() {
+  if (tray) {
+    try { tray.setContextMenu(buildTrayMenu(hooksActiveGlobal)); } catch (e) { /* ignore */ }
+  }
 }
 
 // ── App lifecycle ───────────────────────────────────────────────────────────
@@ -592,25 +1090,48 @@ app.whenReady().then(() => {
     currentActivityVariant = variant;
   });
 
+  // Listen for Slack token set
+  ipcMain.on("slack-token-set", (e, token) => {
+    if (petConfig) {
+      petConfig.set("watchers.slack.token", token);
+      const slack = watcherManager && watcherManager.getWatcher("slack");
+      if (slack) slack.setToken(token);
+      refreshTray();
+    }
+  });
+
   // Auto-setup hooks on launch
-  let hooksActive = false;
   try {
     setupHooks();
-    hooksActive = true;
+    hooksActiveGlobal = true;
   } catch (e) {
     console.error("Could not auto-setup hooks:", e.message);
   }
 
   createWindow();
 
+  // Initialize watcher system (also loads petConfig)
+  initWatchers();
+
+  // Restore saved skin on load
+  const savedSkin = petConfig ? petConfig.get().skin : "default";
+  currentSkinGlobal = savedSkin || "default";
+  console.log("[Skin] Startup — restored skin from config:", currentSkinGlobal);
+  win.webContents.on("did-finish-load", () => {
+    console.log("[Skin] did-finish-load — sending skin:", currentSkinGlobal);
+    if (currentSkinGlobal !== "default") {
+      win.webContents.send("skin-change", currentSkinGlobal);
+    }
+  });
+
   // System tray
   tray = new Tray(path.join(__dirname, "icon.png"));
   tray.setToolTip("Claude Code Pet");
-  tray.setContextMenu(buildTrayMenu(hooksActive));
+  tray.setContextMenu(buildTrayMenu(hooksActiveGlobal));
 
   // Refresh tray menu periodically so stats stay current
   setInterval(() => {
-    try { tray.setContextMenu(buildTrayMenu(hooksActive)); } catch (e) { /* ignore */ }
+    refreshTray();
   }, 15000);
 });
 
@@ -620,6 +1141,8 @@ function writeStatus(s) {
 
 app.on("before-quit", () => {
   progression.shutdown();
+  if (watcherManager) watcherManager.stop();
+  if (petConfig) petConfig.save();
 });
 
 app.on("window-all-closed", () => app.quit());
