@@ -7,8 +7,49 @@ const CONFIG_DIR = path.join(app.getPath("userData"));
 const CONFIG_FILE = path.join(CONFIG_DIR, "config.json");
 
 const DEFAULTS = {
-  version: 1,
-  skin: "default",
+  version: 2,
+  skin: "girlfriend",
+  petName: "Anu",
+  customMessages: [],
+  specialDates: [],
+  // Sound settings
+  soundEnabled: false,
+  soundVolume: 0.7,
+  // Love meter persistent state
+  loveMeter: { points: 0, level: 1 },
+  // Spotify integration
+  spotify: {
+    enabled: false,
+    accessToken: null,
+    refreshToken: null,
+    tokenExpiry: 0,
+    clientId: "",
+    clientSecret: "",
+    showSongChanges: true,
+    favoriteArtists: [],
+  },
+  // Weather settings
+  weather: {
+    enabled: false,
+    latitude: null,
+    longitude: null,
+    cityName: "",
+    showTemperature: true,
+    pollIntervalMin: 30,
+  },
+  // Notification listener (Windows)
+  notifications: {
+    enabled: false,
+    specialPersonName: "Anu",
+    showPreview: false,
+  },
+  // Photo frame
+  photos: {
+    enabled: false,
+    folderPath: null,
+    slideshowIntervalSec: 30,
+    autoOnSpecialDates: true,
+  },
   watchers: {
     idleDetector: { enabled: true, idleThresholdSec: 60 },
     windowTracker: {
@@ -20,6 +61,7 @@ const DEFAULTS = {
         "msedge.exe": "searching",
         "Spotify.exe": "idle-dancing",
         "slack.exe": "reading",
+        "WhatsApp.exe": "idle",
         "Discord.exe": "reading",
         "Obsidian.exe": "reading",
         "WindowsTerminal.exe": "coding",

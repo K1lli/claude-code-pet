@@ -15,7 +15,7 @@
   },
   "build": {
     "appId": "com.claude-code-pet.app",
-    "productName": "Claude Code Pet",
+    "productName": "My Girlfriend",
     "directories": {
       "output": "dist"
     },
@@ -36,7 +36,10 @@
       "set-status.js",
       "icon.png",
       "config.js",
-      "watchers/**/*"
+      "watchers/**/*",
+      "assets/**/*",
+      "node_modules/howler/**/*",
+      "node_modules/spotify-web-api-node/**/*"
     ],
     "extraResources": [
       {
@@ -44,6 +47,10 @@
         "to": "hook.js"
       }
     ]
+  },
+  "dependencies": {
+    "howler": "^2.2.4",
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
     "electron": "^28.0.0",
