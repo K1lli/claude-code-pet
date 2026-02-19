@@ -87,14 +87,14 @@ function processMessageQueue() {
   messageProcessing = true;
   const msg = messageQueue.shift();
   const duration = msg.duration || calcDuration(msg.text);
-  showMessage(msg.text, msg.source, duration);
+  showMessage(msg.text, msg.source, duration, msg.html);
   // Wait for the current message to finish before showing the next
   setTimeout(processMessageQueue, duration + 500);
 }
 
-function showMessage(text, source, duration) {
+function showMessage(text, source, duration, html) {
   if (!win) return;
-  win.webContents.send("show-message", { text, source, duration });
+  win.webContents.send("show-message", { text, source, duration, html });
   setTimeout(() => hideMessage(), duration);
 }
 
@@ -1607,7 +1607,7 @@ app.whenReady().then(() => {
   // Listen for pet interaction events (clicks etc.) from renderer
   ipcMain.on("pet-interaction", (e, data) => {
     if (data.type === "message") {
-      enqueueMessage({ text: data.text, source: data.source, duration: data.duration || calcDuration(data.text) });
+      enqueueMessage({ text: data.text, source: data.source, duration: data.duration || calcDuration(data.text), html: data.html });
     }
   });
 
