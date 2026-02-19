@@ -3401,17 +3401,20 @@
     let sideGlanceTimer = null;
     function scheduleSideGlance() {
       clearTimeout(sideGlanceTimer);
-      const glanceStates = ["coding", "coding-flow", "reading", "testing"];
+      const glanceStates = ["coding", "coding-flow", "reading", "testing", "searching", "debugging"];
       if (!glanceStates.some(s => currentState.startsWith(s))) return;
-      const delay = 20000 + Math.random() * 20000;
+      const delay = 15000 + Math.random() * 20000;
       sideGlanceTimer = setTimeout(() => {
         if (isLongPress) { scheduleSideGlance(); return; }
         const baseExpr = EXPRESSION_MAP[currentState] || "happy";
-        dbg("side-glance", { state: currentState, baseExpr });
-        updateSpriteSkin("look_left");
+        // Randomly pick a glance direction
+        const glanceExprs = ["look_left", "neutral", "thinking", "look_left", "neutral"];
+        const glanceExpr = pickRandom(glanceExprs);
+        dbg("side-glance", { state: currentState, baseExpr, glanceExpr });
+        updateSpriteSkin(glanceExpr);
         if (Math.random() < 0.25) spawnClickHeart(80 + Math.random() * 40, 60, false);
-        if (Math.random() < 0.10) showLocalMessage(pickRandom(WATCHING_MESSAGES), "👀", 4000, false);
-        const dur = 3000 + Math.random() * 2000;
+        if (Math.random() < 0.12) showLocalMessage(pickRandom(WATCHING_MESSAGES), "👀", 4000, false);
+        const dur = 2500 + Math.random() * 2500;
         setTimeout(() => {
           if (!isBlinking) updateSpriteSkin(baseExpr);
           scheduleSideGlance();
@@ -3952,19 +3955,35 @@
       { icon: `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px;display:block"><circle cx="16" cy="16" r="16" fill="#25d366"/><path fill="white" d="M16 7.5C11.3 7.5 7.5 11.3 7.5 16c0 1.5.4 2.9 1.1 4.2L7.5 24.5l4.4-1.1c1.2.6 2.6 1 4.1 1 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm3.8 12c-.2.5-.9.9-1.5 1-.4 0-.9.1-2.8-.6-2.4-.9-3.9-3.3-4-3.4-.1-.2-1-1.3-1-2.5s.6-1.7.8-1.9c.2-.2.5-.3.6-.3h.4c.1 0 .4 0 .5.3l.6 1.5v.3l-.1.2-.2.3-.3.3c-.1.1-.2.2-.1.4.1.2.5.9 1.1 1.5.7.7 1.4 1 1.6 1 .2.1.3.1.4 0 .1-.1.5-.6.6-.8.2-.2.3-.2.5-.1.2.1 1.2.6 1.4.7.2.1.3.2.4.3.1.1.1.6-.1 1.2z"/></svg>`, label: "WhatsApp", key: "whatsapp", whatsapp: true },  // left
     ];
 
-    // Expressions cycled by Vibes! button
+    // Expressions cycled by Vibes! button — all 27 from assets/skins/girlfriend/
     const VIBES_EXPRS = [
-      { expr: "vibe",                msg: "Chillataan~ ✌️",      icon: "😎" },
-      { expr: "lovestruck_heart_eyes", msg: "Rakkautta! 💖",       icon: "😍" },
-      { expr: "laughing",            msg: "Hihihi! 😂",           icon: "😂" },
-      { expr: "winking_blep",        msg: "Peppi-mode! 😜",       icon: "😜" },
-      { expr: "hopeful_star_eyes",   msg: "Tähtiin! ⭐",          icon: "⭐" },
-      { expr: "kissing",             msg: "Pusu! 💋",             icon: "💋" },
-      { expr: "smug",                msg: "Kyllä mä tiesin 😏",   icon: "😏" },
-      { expr: "shy",                 msg: "Ujostutti... 😳",      icon: "😳" },
-      { expr: "thinking",            msg: "Mietityttää... 🤔",    icon: "🤔" },
-      { expr: "meditating",          msg: "Zenissä 🧘",           icon: "🧘" },
-      { expr: "surprised",           msg: "Yllätys! 😲",          icon: "😲" },
+      { expr: "vibe",                  msg: "Chillataan~ ✌️",        icon: "😎" },
+      { expr: "lovestruck_heart_eyes", msg: "Rakkautta! 💖",         icon: "😍" },
+      { expr: "laughing",              msg: "Hihihi! 😂",            icon: "😂" },
+      { expr: "winking_blep",          msg: "Peppi-mode! 😜",        icon: "😜" },
+      { expr: "hopeful_star_eyes",     msg: "Tähtiin! ⭐",           icon: "⭐" },
+      { expr: "kissing",               msg: "Pusu! 💋",              icon: "💋" },
+      { expr: "smug",                  msg: "Kyllä mä tiesin 😏",   icon: "😏" },
+      { expr: "shy",                   msg: "Ujostutti... 😳",       icon: "😳" },
+      { expr: "thinking",              msg: "Mietityttää... 🤔",     icon: "🤔" },
+      { expr: "meditating",            msg: "Zenissä 🧘",            icon: "🧘" },
+      { expr: "surprised",             msg: "Yllätys! 😲",           icon: "😲" },
+      { expr: "happy",                 msg: "Oon niin iloinen! 😊",  icon: "😊" },
+      { expr: "neutral",               msg: "Hmm... 🙂",             icon: "🙂" },
+      { expr: "focused",               msg: "Keskitytään! 🎯",       icon: "🎯" },
+      { expr: "determined",            msg: "Tavoitteessa! 💪",      icon: "💪" },
+      { expr: "proud",                 msg: "Oon ylpeä! 🏆",         icon: "🏆" },
+      { expr: "embarrassed",           msg: "Hävettää vähän... 😅",  icon: "😅" },
+      { expr: "confused",              msg: "Mitäs tämä nyt on? 😕", icon: "😕" },
+      { expr: "annoyed",               msg: "Hmph! 😤",              icon: "😤" },
+      { expr: "angry",                 msg: "Ärsyttää! 😠",          icon: "😠" },
+      { expr: "worried",               msg: "Onko kaikki ok? 😟",    icon: "😟" },
+      { expr: "sad",                   msg: "Vähän surullinen... 😢", icon: "😢" },
+      { expr: "crying",                msg: "Itketyttää 😭",         icon: "😭" },
+      { expr: "scared",                msg: "Pelottaa! 😨",          icon: "😨" },
+      { expr: "sleepy",                msg: "Zzz... 😴",             icon: "😴" },
+      { expr: "silly",                 msg: "Hölmöillään! 🤪",       icon: "🤪" },
+      { expr: "look_left",             msg: "Mitä tuolla on? 👀",    icon: "👀" },
     ];
     let currentVibeIdx = 0;
     const SIZE_STEPS  = [0.75, 1.0, 1.3];
