@@ -906,6 +906,12 @@
       installing: "thinking", "idle-butterfly": "happy",
       // proud — stretching, perfectionist, level-up, deep search
       "idle-stretching": "proud", "testing-perfectionist": "proud", "searching-deep": "proud",
+      // new app states
+      "file-browsing": "confused",   // explorer.exe — etitään jotain
+      "system-panic": "scared",      // task manager — jotain räjähti
+      "writing": "thinking",         // notepad/Word — kirjoitetaan
+      "meeting": "shy",              // Zoom/Teams — palaveri
+      "gaming": "vibe",              // Steam/Epic — pelaillaan
     };
 
     function getExpressionClass(state) {
@@ -3401,7 +3407,7 @@
     let sideGlanceTimer = null;
     function scheduleSideGlance() {
       clearTimeout(sideGlanceTimer);
-      const glanceStates = ["coding", "coding-flow", "reading", "testing", "searching", "debugging"];
+      const glanceStates = ["coding", "coding-flow", "reading", "testing", "searching", "debugging", "writing", "file-browsing"];
       if (!glanceStates.some(s => currentState.startsWith(s))) return;
       const delay = 15000 + Math.random() * 20000;
       sideGlanceTimer = setTimeout(() => {
@@ -3638,6 +3644,34 @@
       if (newState === "success") {
         updateSpriteSkin("laughing");
         setTimeout(() => updateSpriteSkin("happy"), 2000);
+      }
+
+      // New state entry reactions
+      if (newState === "file-browsing" && prev !== "file-browsing") {
+        const msgs = ["Etsitäänkö jotain? 🗂️", "Tiedostojen metsästys! 🔍", "Missähän se tiedosto nyt on... 🤔"];
+        if (Math.random() < 0.5) setTimeout(() => showLocalMessage(pickRandom(msgs), "🗂️", 5000), 1000);
+      }
+
+      if (newState === "system-panic" && prev !== "system-panic") {
+        spawnSweatDrop();
+        const msgs = ["Tehtävienhallinta?! Mikä räjähti?! 😱", "Hei hei hei mikä prosessi menee pieleen?! 😰", "Jotain on rikki... pelottaa vähän 😟"];
+        setTimeout(() => showLocalMessage(pickRandom(msgs), "😱", 6000), 500);
+      }
+
+      if (newState === "writing" && prev !== "writing") {
+        const msgs = ["Kirjoitetaan jotain tärkeää? ✍️", "Sanat virtaa! 📝", "Mä rakastan ku sä kirjoitat 💕✍️"];
+        if (Math.random() < 0.5) setTimeout(() => showLocalMessage(pickRandom(msgs), "✍️", 5000), 1500);
+      }
+
+      if (newState === "meeting" && prev !== "meeting") {
+        const msgs = ["Palaveri alkaa! Muista hymyillä 😊", "Videopuhelu! Näytät tosi hyvältä btw 💕", "Onnea palaveriin! Sä oot paras siellä 💖"];
+        setTimeout(() => showLocalMessage(pickRandom(msgs), "🎥", 6000), 1000);
+      }
+
+      if (newState === "gaming" && prev !== "gaming") {
+        heartBurst(100, 80, 3);
+        const msgs = ["Pelataanko! 🎮 Mäkin haluun! 🥺", "Yay, peliaikaa! 🎮💕", "Pelaa hyvin, mulla on silmä sun pääl! 👀🎮"];
+        setTimeout(() => showLocalMessage(pickRandom(msgs), "🎮", 6000), 500);
       }
 
       // Trigger side-glance scheduling on state change

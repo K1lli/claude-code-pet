@@ -55,18 +55,49 @@ const DEFAULTS = {
     windowTracker: {
       enabled: true,
       processMap: {
+        // Editors & coding
         "Code.exe": "coding",
-        "chrome.exe": "searching",
-        "firefox.exe": "searching",
-        "msedge.exe": "searching",
-        "Spotify.exe": "idle-dancing",
-        "slack.exe": "reading",
-        "WhatsApp.exe": "idle",
-        "Discord.exe": "reading",
-        "Obsidian.exe": "reading",
         "WindowsTerminal.exe": "coding",
         "powershell.exe": "coding",
         "cmd.exe": "coding",
+        // Browsers
+        "chrome.exe": "searching",
+        "firefox.exe": "searching",
+        "msedge.exe": "searching",
+        "opera.exe": "searching",
+        "brave.exe": "searching",
+        // Music / media
+        "Spotify.exe": "idle-dancing",
+        "vlc.exe": "idle-dancing",
+        "wmplayer.exe": "idle-dancing",
+        // Chat & social
+        "slack.exe": "reading",
+        "WhatsApp.exe": "idle",
+        "Discord.exe": "reading",
+        "Telegram.exe": "reading",
+        // Meetings
+        "Teams.exe": "meeting",
+        "ms-teams.exe": "meeting",
+        "Zoom.exe": "meeting",
+        "WebexMeetings.exe": "meeting",
+        // Writing & docs
+        "notepad.exe": "writing",
+        "Notepad++.exe": "writing",
+        "WINWORD.EXE": "writing",
+        "EXCEL.EXE": "reading",
+        "POWERPNT.EXE": "writing",
+        // Notes & reading
+        "Obsidian.exe": "reading",
+        "notion.exe": "reading",
+        "onenote.exe": "reading",
+        // File management
+        "explorer.exe": "file-browsing",
+        // System tools
+        "Taskmgr.exe": "system-panic",
+        // Gaming
+        "steam.exe": "gaming",
+        "EpicGamesLauncher.exe": "gaming",
+        "Battle.net.exe": "gaming",
       },
     },
     systemMonitor: { enabled: true, cpuHighThreshold: 80 },
